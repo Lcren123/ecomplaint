@@ -45,7 +45,7 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
             request.put("username", username);
             request.put("password", password);
             HttpsURLConnection connection = (HttpsURLConnection)
-                    new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/connect.jsp").openConnection();
+                    new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/login.jsp").openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(true);
