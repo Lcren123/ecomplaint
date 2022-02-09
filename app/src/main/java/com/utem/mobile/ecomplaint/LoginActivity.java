@@ -64,7 +64,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public void login(View view) {
+        txtName.setEnabled(false);
+        txtPassword.setEnabled(false);
         loaderManager.initLoader(1, null, this);
+
     }
 
     public void Register(View view) {
