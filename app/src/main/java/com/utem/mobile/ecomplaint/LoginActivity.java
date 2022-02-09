@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.utem.mobile.ecomplaint.model.Complaint;
+
 public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Bundle> {
     private EditText txtName, txtPassword;
     private LoaderManager loaderManager;
@@ -77,4 +79,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
 
+    public void complain(View view) {
+        Intent intent = null;
+        intent = new Intent(LoginActivity.this, ComplainActivity.class);
+        startActivity(intent);
+    }
 }
