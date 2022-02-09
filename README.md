@@ -1,5 +1,5 @@
 1.	Consists of at least FOUR (4) related Activity classes.
-> 1.Login
+> Login
 >	Register
 >	Homepage
 >	Complain
