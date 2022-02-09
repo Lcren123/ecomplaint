@@ -28,42 +28,45 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
         this.password = Password;
     }
 
+    @Override
+    protected void onStartLoading() {
+        forceLoad();
+    }
+
     @Nullable
     @Override
     public Bundle loadInBackground() {
         Bundle response = null;
 
-try {
-    JSONObject request = new JSONObject();
-    String token = null;
-    // username>get username from xml//
+        try {
+            JSONObject request = new JSONObject();
+            String token = null;
+            // username>get username from xml//
 
-    request.put("username", username);
-
-
-    //password>get from xml
-    request.put("password", password);
-    HttpsURLConnection connection = (HttpsURLConnection)
-            new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/connect.jsp").openConnection();
-
-    connection.setDoInput(true);
-    connection.setDoOutput(true);
-    connection.setRequestMethod("POST");
-
-    connection.setRequestProperty("Content-Type", "application/json");
-    connection.getOutputStream().write(request.toString().getBytes());
+            request.put("username", username);
 
 
-    if (connection.getResponseCode() == 200)
-    {
-        response = new Bundle();
-        JSONObject resp = new JSONObject(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
-        token = response.getString("token");
+            //password>get from xml
+            request.put("password", password);
+            HttpsURLConnection connection = (HttpsURLConnection)
+                    new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/connect.jsp").openConnection();
 
-        response.putString("token", resp.getString("token"));
-    }
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.getOutputStream().write(request.toString().getBytes());
 
-    connection.disconnect();
+
+            if (connection.getResponseCode() == 200) {
+                System.out.println("200");
+                response = new Bundle();
+                JSONObject resp = new JSONObject(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
+                token = response.getString("Token");
+
+                response.putString("Token", resp.getString("Token"));
+            }
+
+            connection.disconnect();
 
    /* if (token != null) {
         connection = (HttpsURLConnection) new URL("https://utemsmartparking.tk/api/tenant/devices?pageSize=1000&page=0").openConnection();
@@ -80,11 +83,10 @@ try {
                 System.out.println(data.getJSONObject(i));
         }
     }*/
-    connection.disconnect();
-}
-catch (Exception e){
-e.printStackTrace();
-}
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return response;
     }
 }

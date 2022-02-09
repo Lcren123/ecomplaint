@@ -30,16 +30,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         if (data != null) {
             Intent intent = null;
             //System.out.println(data);
-            String token = data.getString("token", null);
+            String token = data.getString("Token", null);
 
             if (token != null) {
                 Toast.makeText(LoginActivity.this, "login Success",
                         Toast.LENGTH_SHORT).show();
                 intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("token", token);
-            } else
+                intent.putExtra("Token", token);
+            } else {
                 Toast.makeText(LoginActivity.this, "Username/password is incorrect",
                         Toast.LENGTH_SHORT).show();
+                System.out.println("Username/password is incorrect");
+            }
 
 
             startActivity(intent);
