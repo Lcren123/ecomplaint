@@ -41,12 +41,8 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
         try {
             JSONObject request = new JSONObject();
             String token = null;
-            // username>get username from xml//
 
             request.put("username", username);
-
-
-            //password>get from xml
             request.put("password", password);
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/connect.jsp").openConnection();
@@ -55,7 +51,6 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.getOutputStream().write(request.toString().getBytes());
-
 
             if (connection.getResponseCode() == 200) {
                 System.out.println("200");
@@ -66,23 +61,6 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
                 response.putString("Token", resp.getString("Token"));
             }
 
-            connection.disconnect();
-
-   /* if (token != null) {
-        connection = (HttpsURLConnection) new URL("https://utemsmartparking.tk/api/tenant/devices?pageSize=1000&page=0").openConnection();
-
-        connection.setRequestProperty("X-Authorization", "Bearer " + token);
-        connection.setRequestProperty("Accept", "application/json");
-
-        if (connection.getResponseCode() == 200) {
-            JSONObject resp = new JSONObject(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
-            JSONArray data = resp.getJSONArray("data");
-            int length = data.length();
-
-            for (int i = 0; i < length; i++)
-                System.out.println(data.getJSONObject(i));
-        }
-    }*/
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();

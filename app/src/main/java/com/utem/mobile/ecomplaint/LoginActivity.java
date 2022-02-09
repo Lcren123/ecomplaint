@@ -37,14 +37,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                         Toast.LENGTH_SHORT).show();
                 intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra("Token", token);
+                startActivity(intent);
             } else {
                 Toast.makeText(LoginActivity.this, "Username/password is incorrect",
                         Toast.LENGTH_SHORT).show();
                 System.out.println("Username/password is incorrect");
             }
-
-
-            startActivity(intent);
         }
     }
 
