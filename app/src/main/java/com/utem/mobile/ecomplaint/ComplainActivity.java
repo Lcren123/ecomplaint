@@ -1,6 +1,7 @@
 package com.utem.mobile.ecomplaint;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.ClipData;
 import android.content.Intent;
@@ -12,12 +13,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+
+import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -26,16 +30,20 @@ import java.util.List;
 
 public class ComplainActivity extends AppCompatActivity {
 
-    Button nextBtn, btnGallery;
-    ImageView addImageBtn;
-    ImageSwitcher imageView;
-    int PICK_IMAGE_MULTIPLE = 1;
-    String imageEncoded;
-    TextView txtTitle, txtDescription;
-    List <Bitmap> bitmaps;
+    private Button btnSubmit, btnGallery;
+    private EditText txtTitle, txtDescription;
 
-    int position = 0;
-    List<String> imagesEncodedList;
+    private List <Uri> imagesUri;
+
+    /*private List <Bitmap> bitmaps;
+    private ImageSwitcher imageView;*/
+    private int PICK_IMAGE_MULTIPLE = 1;
+    private int position = 0;
+
+
+    // creating object of ViewPager
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
 
 
     @Override
@@ -43,17 +51,21 @@ public class ComplainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complain);
 
-        nextBtn=findViewById(R.id.nextBtn);
+        txtTitle = findViewById(R.id.txtTitle);
+        txtDescription = findViewById(R.id.txtDescription);
 
-        imageView = findViewById(R.id.image);
+        btnSubmit = findViewById(R.id.btnSubmit);
         btnGallery = findViewById(R.id.btnGallery);
+        viewPager = findViewById(R.id.viewPager);
 
 
-        bitmaps=new ArrayList<>();
+        imagesUri= new ArrayList<>();
 
-
+        /*nextBtn=findViewById(R.id.nextBtn);
+        imageView = findViewById(R.id.image);
+        bitmaps=new ArrayList<>();*/
         // showing all images in imageswitcher
-        imageView.setFactory(new ViewSwitcher.ViewFactory() {
+       /* imageView.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
                 ImageView imageView1 = new ImageView(getApplicationContext());
@@ -61,9 +73,9 @@ public class ComplainActivity extends AppCompatActivity {
                 imageView1.setLayoutParams(new ImageSwitcher.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
                 return imageView1;
             }
-        });
+        });*/
 
-        // click here to select image
+        // click button to select image from gallery
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,10 +95,12 @@ public class ComplainActivity extends AppCompatActivity {
         });
 
         // click here to select next image
-        nextBtn.setOnClickListener(new View.OnClickListener() {
+        /*nextBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v) {
-                if (position < bitmaps.size() - 1) {
+                if (position < bitmaps.size() - 1)
+                {
                     // increase the position by 1
                     position++;
                     Drawable drawable =new BitmapDrawable(bitmaps.get(position));
@@ -94,12 +108,12 @@ public class ComplainActivity extends AppCompatActivity {
 
                 }else if (position==0)
                     Toast.makeText(ComplainActivity.this, "No Image", Toast.LENGTH_LONG).show();
-                else {
+                else
+                    {
                     Toast.makeText(ComplainActivity.this, "Last Image", Toast.LENGTH_LONG).show();
-
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -111,40 +125,51 @@ public class ComplainActivity extends AppCompatActivity {
             if (data.getClipData() != null) {
                 ClipData mClipData = data.getClipData();
                 int cout = data.getClipData().getItemCount();
+
                 for (int i = 0; i < cout; i++) {
 
                     Uri imageurl = data.getClipData().getItemAt(i).getUri();
-
-                    try {
+                    imagesUri.add(imageurl);
+                    /*try {
                         InputStream inputStream = getContentResolver().openInputStream(imageurl);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         bitmaps.add(bitmap);
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 }
-
+                viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
+                // initializing the ViewPager Object adding the Adapter to the ViewPager
+                viewPager.setAdapter(viewPagerAdapter);
             } else {
 
                 Uri imageurl = data.getData();
-                try {
+                /*try {
                     InputStream inputStream = getContentResolver().openInputStream(imageurl);
                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                     bitmaps.add(bitmap);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                }
-
+                }*/
+                imagesUri.add(imageurl);
+                viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
+                // initializing the ViewPager Object adding the Adapter to the ViewPager
+                viewPager.setAdapter(viewPagerAdapter);
             }
-            new Thread(new Runnable() {
+           /* new Thread(new Runnable()
+            {
                 @Override
-                public void run() {
-                    for (final Bitmap bitmap : bitmaps){
-                        runOnUiThread(new Runnable() {
+                public void run()
+                {
+                    for (final Bitmap bitmap : bitmaps)
+                    {
+                        runOnUiThread(new Runnable()
+                        {
                             @Override
-                            public void run() {
+                            public void run()
+                            {
                                 Drawable drawable =new BitmapDrawable(bitmap);
                                 imageView.setImageDrawable(drawable);
                             }
@@ -154,13 +179,12 @@ public class ComplainActivity extends AppCompatActivity {
                         }catch (InterruptedException e){
                             e.printStackTrace();
                         }
-
                     }
-
                 }
-            }).start();
-
-        } else {
+            }).start();*/
+        }
+        else
+        {
             // show this if no image is selected
             Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
         }
