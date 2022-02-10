@@ -1,43 +1,35 @@
 package com.utem.mobile.ecomplaint;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageSwitcher;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComplainActivity extends AppCompatActivity {
 
-    private Button btnSubmit, btnGallery;
+    private Button btnSubmit, btnGallery, btnCamera;
     private EditText txtTitle, txtDescription;
 
     private List <Uri> imagesUri;
 
     /*private List <Bitmap> bitmaps;
     private ImageSwitcher imageView;*/
-    private int PICK_IMAGE_MULTIPLE = 1;
+    private int PHOTO_FROM_GALLERY = 1;
     private int position = 0;
 
 
@@ -58,28 +50,19 @@ public class ComplainActivity extends AppCompatActivity {
         btnGallery = findViewById(R.id.btnGallery);
         viewPager = findViewById(R.id.viewPager);
 
-
         imagesUri= new ArrayList<>();
-
-        /*nextBtn=findViewById(R.id.nextBtn);
-        imageView = findViewById(R.id.image);
-        bitmaps=new ArrayList<>();*/
-        // showing all images in imageswitcher
-       /* imageView.setFactory(new ViewSwitcher.ViewFactory() {
-            @Override
-            public View makeView() {
-                ImageView imageView1 = new ImageView(getApplicationContext());
-                imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                imageView1.setLayoutParams(new ImageSwitcher.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
-                return imageView1;
-            }
-        });*/
 
         // click button to select image from gallery
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                if (ActivityCompat.checkSelfPermission(ComplainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(ComplainActivity.this, new String []{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+                    return;
+
+                }
                 // initialising intent
                 Intent intent = new Intent();
 
@@ -90,37 +73,25 @@ public class ComplainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_MULTIPLE);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PHOTO_FROM_GALLERY);
             }
         });
 
-        // click here to select next image
-        /*nextBtn.setOnClickListener(new View.OnClickListener()
-        {
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position < bitmaps.size() - 1)
-                {
-                    // increase the position by 1
-                    position++;
-                    Drawable drawable =new BitmapDrawable(bitmaps.get(position));
-                    imageView.setImageDrawable(drawable);
 
-                }else if (position==0)
-                    Toast.makeText(ComplainActivity.this, "No Image", Toast.LENGTH_LONG).show();
-                else
-                    {
-                    Toast.makeText(ComplainActivity.this, "Last Image", Toast.LENGTH_LONG).show();
-                }
             }
-        });*/
+        });
+
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // When an Image is picked
-        if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == PHOTO_FROM_GALLERY && resultCode == RESULT_OK && null != data) {
             // Get the Image from data
             if (data.getClipData() != null) {
                 ClipData mClipData = data.getClipData();
@@ -158,30 +129,6 @@ public class ComplainActivity extends AppCompatActivity {
                 // initializing the ViewPager Object adding the Adapter to the ViewPager
                 viewPager.setAdapter(viewPagerAdapter);
             }
-           /* new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    for (final Bitmap bitmap : bitmaps)
-                    {
-                        runOnUiThread(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                Drawable drawable =new BitmapDrawable(bitmap);
-                                imageView.setImageDrawable(drawable);
-                            }
-                        });
-                        try {
-                            Thread.sleep(3000);
-                        }catch (InterruptedException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();*/
         }
         else
         {
