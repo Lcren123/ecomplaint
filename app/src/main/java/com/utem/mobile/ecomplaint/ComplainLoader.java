@@ -9,15 +9,16 @@ import androidx.loader.content.AsyncTaskLoader;
 
 import com.utem.mobile.ecomplaint.model.Complaint;
 
-public class ComplainLoader extends AsyncTaskLoader<Complaint> {
+public class ComplainLoader extends AsyncTaskLoader<Integer> {
 
-    public ComplainLoader(@NonNull Context context) {
+    public ComplainLoader(@NonNull Context context, Complaint complaint)
+    {
         super(context);
     }
 
     @Nullable
     @Override
-    public Complaint loadInBackground() {
+    public Integer loadInBackground() {
         return null;
     }
 

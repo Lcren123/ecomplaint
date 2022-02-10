@@ -1,13 +1,19 @@
 package com.utem.mobile.ecomplaint;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -15,24 +21,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.utem.mobile.ecomplaint.model.Complaint;
+import com.utem.mobile.ecomplaint.model.ComplaintImage;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ComplainActivity extends AppCompatActivity {
+public class ComplainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer>{
 
     private Button btnSubmit, btnGallery, btnCamera;
     private EditText txtTitle, txtDescription;
 
     private List <Uri> imagesUri;
+    LoaderManager loaderManager;
 
-    /*private List <Bitmap> bitmaps;
-    private ImageSwitcher imageView;*/
     private int PHOTO_FROM_GALLERY = 1;
     private int position = 0;
-
-
+    private List <ComplaintImage> complaintImageList;
+    private Complaint complaint;
     // creating object of ViewPager
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
@@ -51,6 +60,10 @@ public class ComplainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
 
         imagesUri= new ArrayList<>();
+        complaintImageList = new ArrayList<>();
+        complaint = new Complaint();
+
+        loaderManager =LoaderManager.getInstance(this);
 
         // click button to select image from gallery
         btnGallery.setOnClickListener(new View.OnClickListener() {
@@ -77,13 +90,18 @@ public class ComplainActivity extends AppCompatActivity {
             }
         });
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnSubmit.setOnClickListener(this:: submit);
 
-            }
-        });
 
+    }
+
+    private void submit(View view) {
+
+        complaint.setImageList(complaintImageList);
+        complaint.setComplaintTitle(txtTitle.getText().toString());
+        complaint.setComplaintDescription(txtDescription.getText().toString());
+
+        loaderManager.initLoader(0, null, this);
 
     }
 
@@ -101,14 +119,17 @@ public class ComplainActivity extends AppCompatActivity {
 
                     Uri imageurl = data.getClipData().getItemAt(i).getUri();
                     imagesUri.add(imageurl);
-                    /*try {
+                    try {
+                        ComplaintImage complaintImage = new ComplaintImage();
                         InputStream inputStream = getContentResolver().openInputStream(imageurl);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        bitmaps.add(bitmap);
+                        complaintImage.setBitmap(bitmap);
+                        complaintImageList.add(complaintImage);
+
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    }*/
+                    }
                 }
                 viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
                 // initializing the ViewPager Object adding the Adapter to the ViewPager
@@ -116,14 +137,16 @@ public class ComplainActivity extends AppCompatActivity {
             } else {
 
                 Uri imageurl = data.getData();
-                /*try {
-                    InputStream inputStream = getContentResolver().openInputStream(imageurl);
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    bitmaps.add(bitmap);
+                try {
+                   ComplaintImage complaintImage = new ComplaintImage();
+                        InputStream inputStream = getContentResolver().openInputStream(imageurl);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        complaintImage.setBitmap(bitmap);
+                        complaintImageList.add(complaintImage);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                }*/
+                }
                 imagesUri.add(imageurl);
                 viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
                 // initializing the ViewPager Object adding the Adapter to the ViewPager
@@ -133,7 +156,38 @@ public class ComplainActivity extends AppCompatActivity {
         else
         {
             // show this if no image is selected
-            Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @NonNull
+    @Override
+    public Loader<Integer> onCreateLoader(int id, @Nullable Bundle args) {
+        return new ComplainLoader(this, complaint);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Integer> loader, Integer data) {
+        loaderManager.destroyLoader(loader.getId());
+        int status = data;
+
+        if (status == 1){
+            Toast.makeText(this, "Submit successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ForumActivity.class);
+            startActivity(intent);
+        }
+        else {
+            Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Integer> loader) {
+
+    }
+
+
+
+
+
 }
