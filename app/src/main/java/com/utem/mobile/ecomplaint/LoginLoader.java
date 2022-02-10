@@ -20,12 +20,14 @@ import javax.net.ssl.HttpsURLConnection;
 public class LoginLoader extends AsyncTaskLoader<Bundle> {
 
     private final String username, password;
+    private final String apiConnect;
 
     public LoginLoader(@NonNull Context context, String userName, String Password) {
         super(context);
 
         this.username = userName;
         this.password = Password;
+        this.apiConnect = context.getString(R.string.api_connect);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class LoginLoader extends AsyncTaskLoader<Bundle> {
             request.put("username", username);
             request.put("password", password);
             HttpsURLConnection connection = (HttpsURLConnection)
-                    new URL("https://fec6-1-32-67-229.ngrok.io/e-complain/login.jsp").openConnection();
+                    new URL(apiConnect + "/login.jsp").openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(true);
