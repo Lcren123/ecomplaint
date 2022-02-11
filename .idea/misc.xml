@@ -11,9 +11,15 @@
         <entry key="..\:/Users/asus/git/ecomplaint/app/src/main/res/layout/activity_maps.xml" value="0.1" />
         <entry key="..\:/Users/asus/git/ecomplaint/app/src/main/res/layout/activity_register.xml" value="0.25364583333333335" />
         <entry key="..\:/Users/asus/git/ecomplaint/app/src/main/res/layout/viewpager.xml" value="0.31875" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_camera.xml" value="0.11927083333333334" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_forum.xml" value="0.11927083333333334" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_forum_detail.xml" value="0.11927083333333334" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_forum_row.xml" value="0.11927083333333334" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_full_screen.xml" value="0.11927083333333334" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/ecomplaint/app/src/main/res/layout/activity_maps.xml" value="0.11927083333333334" />
       </map>
     </option>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_15_PREVIEW" project-jdk-name="15" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>
