@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ecomplaint">
         <activity
+            android:name=".CamaraActivity"
+            android:exported="true" />
+        <activity
             android:name=".FullScreenActivity"
             android:exported="true" />
         <activity

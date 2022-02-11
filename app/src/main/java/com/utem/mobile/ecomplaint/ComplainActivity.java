@@ -1,5 +1,8 @@
 package com.utem.mobile.ecomplaint;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +39,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     private EditText txtTitle, txtDescription;
 
     private List <Uri> imagesUri;
-    LoaderManager loaderManager;
+    private LoaderManager loaderManager;
 
     private int PHOTO_FROM_GALLERY = 1;
     private int position = 0;
@@ -45,6 +48,8 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     // creating object of ViewPager
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
+
+    private ActivityResultLauncher<Intent> cameraLauncher;
 
 
     @Override
@@ -58,12 +63,17 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         btnSubmit = findViewById(R.id.btnSubmit);
         btnGallery = findViewById(R.id.btnGallery);
         viewPager = findViewById(R.id.viewPager);
+        btnCamera = findViewById(R.id.btnGCamera);
 
         imagesUri= new ArrayList<>();
         complaintImageList = new ArrayList<>();
         complaint = new Complaint();
 
+        cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),this::cameraResult);
+
         loaderManager =LoaderManager.getInstance(this);
+
+        btnCamera.setOnClickListener(this::openCamera);
 
         // click button to select image from gallery
         btnGallery.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +103,12 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         btnSubmit.setOnClickListener(this:: submit);
 
 
+    }
+
+    private void cameraResult(ActivityResult result) {
+    }
+
+    private void openCamera(View view) {
     }
 
     private void submit(View view) {
