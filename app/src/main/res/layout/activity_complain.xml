@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fillViewport="false"
     tools:context=".ComplainActivity">
-
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <GridLayout
         android:id="@+id/view2"
@@ -26,12 +28,12 @@
 
         <EditText
             android:id="@+id/txtTitle"
-            android:layout_width="match_parent"
+            android:layout_width="326dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:gravity="right"
-            android:minHeight="48dp"
-            android:inputType="text"/>
+            android:inputType="text"
+            android:minHeight="48dp" />
 
         <TextView
             android:labelFor="@+id/txtDescription"
@@ -41,7 +43,7 @@
 
         <EditText
             android:id="@+id/txtDescription"
-            android:layout_width="match_parent"
+            android:layout_width="326dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:gravity="right"
@@ -51,38 +53,50 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Image"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:text="Image" />
 
-        <Button
-            android:id="@+id/btnGallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_gallery"
-            android:text="Gallery" />
-        <Button
-            android:id="@+id/btnGCamera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_camera"
-            android:text="Camera" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:drawableLeft="@drawable/ic_gallery"
+                android:text="Gallery" />
+
+            <!-- viewpager to show images -->
+            <Button
+                android:id="@+id/btnGCamera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:drawableLeft="@drawable/ic_camera"
+                android:text="Camera" />
+
+        </LinearLayout>
 
     </GridLayout>
 
-    <!-- viewpager to show images -->
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="200dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
-        android:visibility="gone"/>
-
+        android:layout_marginVertical="10dp"
+        android:visibility="gone" />
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="1"
         android:orientation="horizontal"
-        android:padding="10dp" >
+        android:padding="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -94,6 +108,7 @@
             android:id="@+id/txtLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:minHeight="48dp"
             />
 
@@ -128,3 +143,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+</ScrollView>
