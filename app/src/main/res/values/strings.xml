@@ -6,4 +6,9 @@
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
+    <string name="ICNo">icNo</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="phone_no">Phone No</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="next">Next</string>
 </resources>
