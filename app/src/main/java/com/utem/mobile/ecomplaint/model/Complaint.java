@@ -9,11 +9,11 @@ public class Complaint {
     private ComplaintCategory category;
     private Resident resident;
 
-    private int complaintID=0;
+    private int complaintID = 0;
     private String complaintTitle;
     private String complaintDescription;
-    private long complaintLongitude;
-    private long complaintLatitude;
+    private double complaintLongitude;
+    private double complaintLatitude;
     private String complaintStatus="Pending";
     private String complaintDateTime;
     List <ComplaintImage> imageList;
@@ -58,19 +58,19 @@ public class Complaint {
         this.complaintDescription = complaintDescription;
     }
 
-    public long getComplaintLongitude() {
+    public double getComplaintLongitude() {
         return complaintLongitude;
     }
 
-    public void setComplaintLongitude(long complaintLongitude) {
+    public void setComplaintLongitude(double complaintLongitude) {
         this.complaintLongitude = complaintLongitude;
     }
 
-    public long getComplaintLatitude() {
+    public double getComplaintLatitude() {
         return complaintLatitude;
     }
 
-    public void setComplaintLatitude(long complaintLatitude) {
+    public void setComplaintLatitude(double complaintLatitude) {
         this.complaintLatitude = complaintLatitude;
     }
 

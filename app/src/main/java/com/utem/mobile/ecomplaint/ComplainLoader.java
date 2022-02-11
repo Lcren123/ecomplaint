@@ -66,18 +66,25 @@ public class ComplainLoader extends AsyncTaskLoader<Integer> {
                 encodedImages.add(encodeImage);
             }
             JSONArray imagesJSON = new JSONArray(encodedImages);
-            encodedImages.size();
             request.put("imageList",imagesJSON);
-            int i = 0;
-            Integer.toString(i);
+            request.put("ComplaintTitle",complaint.getComplaintTitle());
+            request.put("ComplaintDescription",complaint.getComplaintDescription());
+            request.put("ComplaintLongitude",complaint.getComplaintLongitude());
+            request.put("ComplaintLatitude",complaint.getComplaintLatitude());
+            request.put("ComplaintStatus",complaint.getComplaintStatus());
+            //request.put("ResidentID",complaint.getResident().getResidentID());
+            request.put("ResidentID",1);
+            request.put("CategoryID",1);
+            //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
 
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL(apiConnect + "/addComplaint.jsp").openConnection();
 
             connection.setDoInput(true);
-            connection.setDoOutput(true);
+           // connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.getOutputStream().write(request.toString().getBytes());
+
 
             System.out.println(connection.getResponseCode());
             if (connection.getResponseCode() == 200) {

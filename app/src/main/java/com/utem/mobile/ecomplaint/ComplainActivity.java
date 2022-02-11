@@ -270,7 +270,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoadFinished(@NonNull Loader<Integer> loader, Integer data) {
         loaderManager.destroyLoader(loader.getId());
-        int status = data;
+        int status = 0;
+        if(data != null) {
+            status = data;
+        }
 
         if (status == 1) {
             Toast.makeText(this, "Submit successfully", Toast.LENGTH_SHORT).show();
@@ -320,8 +323,8 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     private void submitComplaint(View view) {
 
         String strLocation []= txtLocation.getText().toString().split(",") ;
-        complaint.setComplaintLatitude(Long.parseLong(strLocation[0]));
-        complaint.setComplaintLongitude(Long.parseLong(strLocation[1]));
+        complaint.setComplaintLatitude(Double.parseDouble(String.format("%.5f",Double.parseDouble(strLocation[0]))));
+        complaint.setComplaintLongitude(Double.parseDouble(String.format("%.5f",Double.parseDouble(strLocation[1]))));
         complaint.setImageList(complaintImageList);
         complaint.setComplaintTitle(txtTitle.getText().toString());
         complaint.setComplaintDescription(txtDescription.getText().toString());
