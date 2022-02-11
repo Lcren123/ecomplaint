@@ -64,10 +64,11 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void finish(View view) {
-        Intent intent = new Intent();
-        intent.putStringArrayListExtra("imageList",imageList);
-
-        setResult(RESULT_OK,intent);
+        if(imageList != null) {
+            Intent intent = new Intent();
+            intent.putStringArrayListExtra("imageList", imageList);
+            setResult(RESULT_OK, intent);
+        }
         finish();
     }
 
@@ -123,16 +124,16 @@ public class CameraActivity extends AppCompatActivity {
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         System.out.println(storageDirectory.toString());
-        String fileName = "Complaint_JPEG_" + timeStamp + ".jpeg";
+        String fileName = "Complaint_JPEG_" + timeStamp + ".jpg";
 
-        File photoFile = new File(storageDirectory.toString() + "/Camera" , fileName );
+        File photoFile = new File(storageDirectory, fileName );
         System.out.println(photoFile.toString());
 
         ImageCapture.OutputFileOptions outputFileOptions =
                 new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
 
-        imageCapture.takePicture(outputFileOptions, Executors.newSingleThreadExecutor() ,
+        imageCapture.takePicture( outputFileOptions,Executors.newSingleThreadExecutor() ,
                 new ImageCapture.OnImageSavedCallback() {
 
                     @Override
@@ -141,7 +142,7 @@ public class CameraActivity extends AppCompatActivity {
                         if(imageList == null){
                             imageList = new ArrayList<>();
                         }
-                        imageList.add(outputFileResults.getSavedUri().toString());
+                        imageList.add(Uri.fromFile(photoFile).toString());
                     }
 
                     @Override
