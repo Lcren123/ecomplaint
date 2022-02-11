@@ -1,9 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity">
+    tools:context=".RegisterActivity"
+    android:orientation="vertical">
+<TextView
+    android:id="@+id/title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="center_vertical"
+    android:text="Title"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="5">
+
+        <TextView
+            android:id="@+id/nameOnIc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/name"/>
+
+
+        <EditText
+            android:id="@+id/editnameOnIc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="text"
+            android:autofillHints="as shown in IC"
+            />
+
+        <TextView
+            android:id="@+id/IC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ICNo"/>
+
+
+        <EditText
+            android:id="@+id/editIC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="number"
+            android:autofillHints="EX: XX0114XX61XXX"
+            />
+
+        <TextView
+            android:id="@+id/Profilename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_name"/>
+
+
+        <EditText
+            android:id="@+id/editProfileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="text"
+            android:autofillHints="Name shown to others user"
+            />
+        <TextView
+            android:id="@+id/PhoneNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/phone_no"/>
+
+
+        <EditText
+            android:id="@+id/editPhoneNo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="phone"
+            android:autofillHints="EX: 0XX123456789"
+            />
+        <TextView
+            android:id="@+id/Newpassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/password" />
+
+        <EditText
+            android:id="@+id/editNewPassword"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="48dp"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:id="@+id/Confirmpassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm_password" />
+
+        <EditText
+            android:id="@+id/editConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="48dp"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
+    </GridLayout>
+
+    <Button
+        android:onClick="Register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text= "@string/next"/>
+
+</LinearLayout>

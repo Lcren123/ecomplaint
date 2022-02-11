@@ -164,7 +164,38 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
         btnSubmit.setOnClickListener(this::submitComplaint);
 
+    private void cameraResult(ActivityResult result) {
+        Intent intent = result.getData();
+        List<String> imageList = null;
+        if(intent != null) {
+             imageList = intent.getStringArrayListExtra("imageList");
+        }
 
+        if (imageList != null) {
+            for (String imageString: imageList) {
+
+                Uri imageurl = Uri.parse(imageString);
+                imagesUri.add(imageurl);
+                try {
+                    ComplaintImage complaintImage = new ComplaintImage();
+                    InputStream inputStream = getContentResolver().openInputStream(imageurl);
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    complaintImage.setBitmap(bitmap);
+                    complaintImageList.add(complaintImage);
+
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
+            // initializing the ViewPager Object adding the Adapter to the ViewPager
+            viewPager.setAdapter(viewPagerAdapter);
+        }
+    }
+
+    private void openCamera(View view) {
+        cameraLauncher.launch(new Intent(this,CameraActivity.class));
     }
 
 
@@ -215,9 +246,14 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 // initializing the ViewPager Object adding the Adapter to the ViewPager
                 viewPager.setAdapter(viewPagerAdapter);
             }
-        } else {
+        }
+        else if(data == null && requestCode == PHOTO_FROM_GALLERY)
+        {
             // show this if no image is selected
             Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "You haven't capture any image", Toast.LENGTH_SHORT).show();
         }
     }
 
