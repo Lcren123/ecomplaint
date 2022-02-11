@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,17 +51,22 @@ public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecycler
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView id,time;
+        TextView id,time,title;
+        ImageView image;
 
         ViewHolder(View itemView) {
             super(itemView);
             id = itemView.findViewById(R.id.id);
+            title = itemView.findViewById(R.id.title);
             time = itemView.findViewById(R.id.time);
+            image=itemView.findViewById(R.id.complaintImage);
             itemView.setOnClickListener(this);
         }
         public void setComplaint (Complaint complaint){
             id.setText(complaint.getComplaintID());
+            title.setText(complaint.getComplaintTitle());
             time.setText(complaint.getComplaintDateTime());
+
 
         }
 
