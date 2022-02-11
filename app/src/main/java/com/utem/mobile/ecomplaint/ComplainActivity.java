@@ -113,9 +113,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_CODE);
 
         } else {
-            // when permission granted get current location
-            getCurrentLocation();
-            supportMapFragment.getMapAsync(googleMap -> googleMap.setOnMapClickListener(latLng -> {
+                // when permission granted get current location
+                getCurrentLocation();
+
+                supportMapFragment.getMapAsync(googleMap -> googleMap.setOnMapClickListener(latLng -> {
                 // when click on map
                 // initialize marker options
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -144,7 +145,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
                 if (ActivityCompat.checkSelfPermission(ComplainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat.requestPermissions(ComplainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+                    ActivityCompat.requestPermissions(ComplainActivity.this, new String []{Manifest.permission.READ_EXTERNAL_STORAGE},100);
                     return;
 
                 }
@@ -162,7 +163,40 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             }
         });
 
-        btnSubmit.setOnClickListener(this::submitComplaint);
+        btnSubmit.setOnClickListener(this:: submit);
+
+
+    }
+
+    private void getCurrentLocation() {
+
+        @SuppressLint("MissingPermission")
+        Task <Location> task = client.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+
+                if(location!=null){
+                    supportMapFragment.getMapAsync(googleMap -> {
+                        latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        //set position of marker
+                        markerOptions.position(latLng);
+                        //set title of marker
+                        markerOptions.title("I am there");
+                        // remove all marker
+                        googleMap.clear();
+                        // animating to zoom the marker
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                        // add marker on map
+                        googleMap.addMarker(markerOptions);
+                        txtLocation.setText(latLng.latitude + "," + latLng.longitude);
+                    });
+                }
+            }
+        });
+
+    }
 
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
@@ -198,6 +232,15 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         cameraLauncher.launch(new Intent(this,CameraActivity.class));
     }
 
+    private void submit(View view) {
+
+        complaint.setImageList(complaintImageList);
+        complaint.setComplaintTitle(txtTitle.getText().toString());
+        complaint.setComplaintDescription(txtDescription.getText().toString());
+
+        loaderManager.initLoader(0, null, this);
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -282,87 +325,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            getCurrentLocation();
-        }
-    }
-
-    //@SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
-        // initialize task location
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<Location> task = client.getLastLocation();
-            task.addOnSuccessListener(location -> {
-                // when success
-                if (location!= null){
-                    supportMapFragment.getMapAsync(googleMap -> {
-
-                        latLng = new LatLng(location.getLatitude(), location.getLatitude());
-                        // when click on map
-                        // initialize marker options
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        //set position of marker
-                        markerOptions.position(latLng);
-                        //set title of marker
-                        markerOptions.title("I am here");
-                        //markerOptions.title(latLng.latitude + " : "+ latLng.longitude);
-                        // remove all marker
-                        googleMap.clear();
-                        // animating to zoom the marker
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
-                        // add marker on map
-                        googleMap.addMarker(markerOptions);
-
-                        txtLocation.setText(latLng.latitude + " , "+ latLng.longitude);
-                    });
-                }
-            });
-        }
-
-
-    }
-
-    private void setGoogleMapMarker(@NonNull GoogleMap googleMap, LatLng latLng) {
-        // when click on map
-        // initialize marker options
-        MarkerOptions markerOptions = new MarkerOptions();
-        //set position of marker
-        markerOptions.position(this.latLng);
-        //set title of marker
-        markerOptions.title(this.latLng.latitude + " : "+ this.latLng.longitude);
-        // remove all marker
-        googleMap.clear();
-        // animating to zoom the marker
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.latLng,10));
-        // add marker on map
-        googleMap.addMarker(markerOptions);
-
-        txtLocation.setText(this.latLng.latitude + ","+ this.latLng.longitude);
-    }
-
-    private void cameraResult(ActivityResult result) {}
-
-    private void openCamera(View view) {}
-
-    // this method will submit the user's complaint
-    private void submitComplaint(View view)
-    {
-        String strLocation []= txtLocation.getText().toString().split(",") ;
-        complaint.setComplaintLatitude(Long.parseLong(strLocation[0]));
-        complaint.setComplaintLongitude(Long.parseLong(strLocation[1]));
-        complaint.setImageList(complaintImageList);
-        complaint.setComplaintTitle(txtTitle.getText().toString());
-        complaint.setComplaintDescription(txtDescription.getText().toString());
-
-        loaderManager.initLoader(0, null, this);
-
-    }
 
 
 
