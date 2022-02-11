@@ -172,13 +172,15 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
         List<String> imageList = null;
-        if (intent != null) {
+        if (intent != null)
+        {
             imageList = intent.getStringArrayListExtra("imageList");
         }
 
-        if (imageList != null) {
-            for (String imageString : imageList) {
-
+        if (imageList != null)
+        {   viewPager.setVisibility(View.VISIBLE);
+            for (String imageString : imageList)
+            {
                 Uri imageurl = Uri.parse(imageString);
                 imagesUri.add(imageurl);
                 try {
