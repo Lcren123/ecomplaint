@@ -28,14 +28,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class BluetoothActivity extends AppCompatActivity {
 
-    private ActivityResultLauncher<Intent> bluetoothEnabler;
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothLeScanner bleScanner;
-    private BeaconCallback beaconCallback;
     private String token;
-    private static final int REQUEST_ENABLE_BT = 0;
-    private static final int REQUEST_DISCOVER_BT = 1;
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -54,61 +48,38 @@ public class BluetoothActivity extends AppCompatActivity {
             token = (String) savedInstanceState.getSerializable("token");
         }
 
-        bluetoothEnabler = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), this::enable);
-
-        registerForActivityResult(new ActivityResultContracts.RequestPermission(),
-                this::request).launch(Manifest.permission.ACCESS_FINE_LOCATION);
-        Intent intent2 = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        startActivityForResult(intent2, REQUEST_DISCOVER_BT);
-
-        ActivityCompat.requestPermissions(BluetoothActivity.this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                MY_PERMISSIONS_REQUEST_LOCATION);
-
-    }
-
-    private void request(boolean isGranted)
-    {
-        BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        bluetoothAdapter = bluetoothManager.getAdapter();
-        bleScanner = bluetoothAdapter.getBluetoothLeScanner();
-        beaconCallback = new BeaconCallback();
 
 
+        //ActivityCompat.requestPermissions(BluetoothActivity.this,
+          //      new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            //    MY_PERMISSIONS_REQUEST_LOCATION);
 
 
-    }
+        ActivityResultLauncher<String[]> locationPermissionRequest =
+                registerForActivityResult(new ActivityResultContracts
+                                .RequestMultiplePermissions(), result -> {
+                            Boolean fineLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_FINE_LOCATION, false);
+                            Boolean coarseLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                            if (fineLocationGranted != null && fineLocationGranted) {
+                              //send();
+                                Toast.makeText(this, "Haha", Toast.LENGTH_SHORT).show();
+                            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                                Toast.makeText(this, "Location permission should be enable!", Toast.LENGTH_SHORT).show();
+                            } else {
 
-
-    private void enable(ActivityResult activityResult)
-    {
-        if (activityResult.getResultCode() == RESULT_OK)
-            scan();
-    }
-
-    private void scan(View view)
-    {
-
-        if (!bluetoothAdapter.isEnabled())
-            bluetoothEnabler.launch(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
-        else
-            scan();
-    }
-
-    private void scan()
-    {
-        new Handler().postDelayed(this::stop, 30000);
-        bleScanner.startScan(beaconCallback);
-    }
-
-    private void stop()
-    {
-        Executors.newSingleThreadExecutor().execute(this::send);
-        bleScanner.stopScan(beaconCallback);
+                                Toast.makeText(this, "No location access granted!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+                locationPermissionRequest.launch(new String[] {
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION
+});
 
     }
+
 
     private void send()
     {
@@ -134,6 +105,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 System.out.println("Fail");
 
             connection.disconnect();
+
         }
         catch (Exception e)
         {
@@ -141,14 +113,4 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private class BeaconCallback extends ScanCallback
-    {
-
-
-        @Override
-        public void onScanResult(int callbackType, ScanResult result)
-        {
-//           //
-        }
-    }
 }
