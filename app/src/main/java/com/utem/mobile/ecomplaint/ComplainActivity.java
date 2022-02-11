@@ -109,6 +109,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void openCamera(View view) {
+        cameraLauncher.launch(new Intent(this,CameraActivity.class));
     }
 
     private void submit(View view) {
