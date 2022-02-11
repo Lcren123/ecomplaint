@@ -28,11 +28,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.utem.mobile.ecomplaint.model.Complaint;
@@ -111,10 +113,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_CODE);
 
         } else {
-                // when permission granted get current location
-                getCurrentLocation();
+            // when permission granted get current location
+            getCurrentLocation();
 
-                supportMapFragment.getMapAsync(googleMap -> googleMap.setOnMapClickListener(latLng -> {
+            supportMapFragment.getMapAsync(googleMap -> googleMap.setOnMapClickListener(latLng -> {
                 // when click on map
                 // initialize marker options
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -125,7 +127,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 // remove all marker
                 googleMap.clear();
                 // animating to zoom the marker
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                 // add marker on map
                 googleMap.addMarker(markerOptions);
                 txtLocation.setText(latLng.latitude + "," + latLng.longitude);
@@ -143,7 +145,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
                 if (ActivityCompat.checkSelfPermission(ComplainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat.requestPermissions(ComplainActivity.this, new String []{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+                    ActivityCompat.requestPermissions(ComplainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
                     return;
 
                 }
@@ -167,16 +169,15 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     }
 
 
-
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
         List<String> imageList = null;
-        if(intent != null) {
-             imageList = intent.getStringArrayListExtra("imageList");
+        if (intent != null) {
+            imageList = intent.getStringArrayListExtra("imageList");
         }
 
         if (imageList != null) {
-            for (String imageString: imageList) {
+            for (String imageString : imageList) {
 
                 Uri imageurl = Uri.parse(imageString);
                 imagesUri.add(imageurl);
@@ -199,9 +200,8 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void openCamera(View view) {
-        cameraLauncher.launch(new Intent(this,CameraActivity.class));
+        cameraLauncher.launch(new Intent(this, CameraActivity.class));
     }
-
 
 
     @Override
@@ -251,13 +251,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 // initializing the ViewPager Object adding the Adapter to the ViewPager
                 viewPager.setAdapter(viewPagerAdapter);
             }
-        }
-        else if(data == null && requestCode == PHOTO_FROM_GALLERY)
-        {
+        } else if (data == null && requestCode == PHOTO_FROM_GALLERY) {
             // show this if no image is selected
             Toast.makeText(this, "You haven't picked Image", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Toast.makeText(this, "You haven't capture any image", Toast.LENGTH_SHORT).show();
         }
     }
@@ -283,7 +280,8 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Integer> loader) {}
+    public void onLoaderReset(@NonNull Loader<Integer> loader) {
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -296,14 +294,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
     private void getCurrentLocation() {
 
-        @SuppressLint("MissingPermission")
-        Task <Location> task = client.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-
-                if(location!=null){
-                    supportMapFragment.getMapAsync(googleMap -> {
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            client.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,cancellationTokenSource.getToken())
+                    .addOnSuccessListener(this,location ->  supportMapFragment.getMapAsync(googleMap -> {
                         latLng = new LatLng(location.getLatitude(),location.getLongitude());
                         MarkerOptions markerOptions = new MarkerOptions();
                         //set position of marker
@@ -313,15 +307,12 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                         // remove all marker
                         googleMap.clear();
                         // animating to zoom the marker
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                         // add marker on map
                         googleMap.addMarker(markerOptions);
                         txtLocation.setText(latLng.latitude + "," + latLng.longitude);
-                    });
-                }
-            }
-        });
-
+                    }));
+        }
     }
 
     private void submitComplaint(View view) {
