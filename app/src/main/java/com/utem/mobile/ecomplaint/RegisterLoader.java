@@ -45,11 +45,12 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
             JSONObject request = new JSONObject();
             String token = null;
 
-            request.put("username", name);
-            request.put("password", password);
-            request.put("", IcNo);
-            request.put("",phoneNo);
-            request.put("",profileName);
+            request.put("UserName", name);
+            request.put("UserPassword", password);
+            request.put("UserIC", IcNo);
+            request.put("UserPhone",phoneNo);
+            request.put("UserProfileName",profileName);
+            request.put("UserProfileName","resident");
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL(apiConnect + "/login.jsp").openConnection();
 
