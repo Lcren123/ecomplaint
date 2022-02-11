@@ -58,11 +58,14 @@
             android:id="@+id/btnGallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Gallery"
-            android:drawableLeft="@drawable/ic_gallery" />
-
-
+            android:drawableLeft="@drawable/ic_gallery"
+            android:text="Gallery" />
+        <Button
+            android:id="@+id/btnGCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_camera"
+            android:text="Camera" />
 
     </GridLayout>
 
@@ -88,6 +91,27 @@
         android:layout_gravity="center"
         android:text="Next"
         android:minHeight="48dp" /> -->
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="Location" />
+
+        <TextView
+            android:id="@+id/txtLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            />
+
+    </GridLayout>
 
     <Button
         android:id="@+id/btnSubmit"

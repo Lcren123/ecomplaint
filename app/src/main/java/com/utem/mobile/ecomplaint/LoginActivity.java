@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
         if (data != null) {
             Intent intent = null;
-            //System.out.println(data);
+
             String token = data.getString("Token", null);
 
             if (token != null) {
@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             } else {
                 Toast.makeText(LoginActivity.this, "Username/password is incorrect",
                         Toast.LENGTH_SHORT).show();
-                System.out.println("Username/password is incorrect");
+
             }
         }
     }

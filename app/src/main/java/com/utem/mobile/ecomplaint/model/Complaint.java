@@ -1,16 +1,23 @@
 package com.utem.mobile.ecomplaint.model;
 
+import android.graphics.Bitmap;
+
+import java.util.List;
+
 public class Complaint {
 
     private ComplaintCategory category;
     private Resident resident;
 
     private int complaintID=0;
+    private String complaintTitle;
     private String complaintDescription;
     private long complaintLongitude;
     private long complaintLatitude;
-    private String complaintStatus;
+    private String complaintStatus="Pending";
     private String complaintDateTime;
+    List <ComplaintImage> imageList;
+
 
     public ComplaintCategory getCategory() {
         return category;
@@ -28,12 +35,19 @@ public class Complaint {
         this.resident = resident;
     }
 
+
     public int getComplaintID() {
         return complaintID;
     }
 
     public void setComplaintID(int complaintID) {
         this.complaintID = complaintID;
+    }
+
+    public String getComplaintTitle() {return complaintTitle;}
+
+    public void setComplaintTitle(String complaintTitle) {
+        this.complaintTitle = complaintTitle;
     }
 
     public String getComplaintDescription() {
@@ -75,7 +89,13 @@ public class Complaint {
     public void setComplaintDateTime(String complaintDateTime) {
         this.complaintDateTime = complaintDateTime;
     }
+    public List<ComplaintImage> getImageList() {
+        return imageList;
+    }
 
+    public void setImageList(List<ComplaintImage> imageList) {
+        this.imageList = imageList;
+    }
 
 
 }
