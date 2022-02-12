@@ -222,9 +222,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                sendLocalToDatabase();
            }
         }});
-        Executors.newSingleThreadExecutor().execute(()-> {
-            getCategory();
-        });
     }
 
     private void cameraResult(ActivityResult result) {
@@ -419,8 +416,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
             complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
             complaintRoom.setUsername(username);
-           // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
-          //  complaintRoom.setComplaintID(1);
+            complaintRoom.setCategoryName(complaint.getCategory().getCategoryName());
             complaintRoom.setConnectedToDatabase(false);
 
             List<ComplaintImageRoom> images = null;
@@ -442,9 +438,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
             complaintViewModel.addComplaint(complaintRoom,images);
             Toast.makeText(this, "Added into room database", Toast.LENGTH_SHORT).show();
-
         }
-
     }
 
     private void createNotificationChannel() {
@@ -487,7 +481,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             //request.put("Username",complaint.getResident().getUserName());
             request.put("Username","resident");
 
-            request.put("CategoryID",1);
+            request.put("CategoryName",localComplaint.getCategory().getCategoryName());
             //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
 
             HttpsURLConnection connection = (HttpsURLConnection)
@@ -514,36 +508,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void getCategory() {
-
-        try {
-            HttpsURLConnection connection = (HttpsURLConnection)
-                    new URL(this.getString(R.string.api_connect) + "/getCategory.jsp").openConnection();
-
-            connection.setRequestMethod("GET");
-
-            System.out.println(connection.getResponseCode());
-
-            if (connection.getResponseCode() == 200) {
-                JSONArray response = new JSONArray(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
-                category = new String[response.length()];
-                for (int i = 0; i < response.length(); i++) {
-                    category[i] = (response.getJSONObject(i).getString("CategoryName"));
-                }
-
-
-
-                runOnUiThread();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void runOnUiThread() {
-
     }
 
 }
