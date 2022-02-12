@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ecomplaint</string>
+    <string name="app_name">E-Complaint</string>
     <string name="api_connect">https://fbc2-118-100-165-78.ngrok.io/e-complain</string>
     <string name="title">Title</string>
     <string name="name">Name</string>

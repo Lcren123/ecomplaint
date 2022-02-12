@@ -5,18 +5,16 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,7 +88,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         resident = new Resident();
         IcFrontImage = findViewById(R.id.FrontIC);
         IcBackImage = findViewById(R.id.BackIC);
-        //cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
 
         btnICBack = findViewById(R.id.btnICBack);
         btnICFront= findViewById(R.id.btnICFront);
