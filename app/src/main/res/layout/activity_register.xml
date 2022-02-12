@@ -119,11 +119,23 @@
 
     <Button
         android:id="@+id/btnGCamera"
+        android:onClick="GetICPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:drawableLeft="@drawable/ic_camera"
         android:text="Camera" />
+
+    <ImageView
+        android:id="@+id/FrontIC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <ImageView
+        android:id="@+id/BackIC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
     <Button
         android:onClick="Register"
         android:layout_width="match_parent"

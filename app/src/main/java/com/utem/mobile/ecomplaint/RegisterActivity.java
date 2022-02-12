@@ -13,10 +13,13 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
@@ -33,10 +36,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     private List<Uri> imagesUri;
     private LoaderManager loaderManager;
     private Resident resident;
-
-    // creating object of ViewPager for photo
-    private ViewPager viewPager;
-    private ViewPagerAdapter viewPagerAdapter;
+    private Button btnCamera;
+    private ImageView IcFrontImage, IcBackImage;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
@@ -87,22 +88,27 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtPassword = findViewById(R.id.editPassword);
         txtConfirmPassword = findViewById(R.id.editConfirmPassword);
         Resident resident = new Resident();
+        IcFrontImage = findViewById(R.id.FrontIC);
+        IcBackImage = findViewById(R.id.BackIC);
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
 
     }
 
     public void Register(View view) {
         txtName.setEnabled(false);
-        txtProfileName.setEnabled(false);
-        IcNo.setEnabled(false);
-        phoneNo.setEnabled(false);
-        txtPassword.setEnabled(false);
-        txtConfirmPassword.setEnabled(false);
         resident.setUserName(txtName.getText().toString());
+        txtProfileName.setEnabled(false);
+        resident.setUserProfileName(txtProfileName.getText().toString());
+        IcNo.setEnabled(false);
+        resident.setUserIC(IcNo.getText().toString());
+        phoneNo.setEnabled(false);
+        resident.setUserPhone(phoneNo.getText().toString());
+        txtPassword.setEnabled(false);
+        resident.setPassword(txtPassword.getText().toString());
+        txtConfirmPassword.setEnabled(false);
 
-        RegisterCheck(txtName.getText().toString(),txtProfileName.getText().toString(),
-                IcNo.getText().toString(),phoneNo.getText().toString(),txtPassword.getText().toString(),
-                txtConfirmPassword.getText().toString());
+
+        RegisterCheck(resident, txtConfirmPassword.getText().toString());
 
     }
 
@@ -121,15 +127,14 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtConfirmPassword.setEnabled(true);
     }
 
-    public void RegisterCheck(String name, String profileName, String IcNo, String phoneNo, String password
-    ,String confirmPassword){
+    public void RegisterCheck(Resident resident, String confirmPassword){
         int n, check = 0;
         //nameCheck
-        for(n=0; n <8; n++) {
+        for(n=0; n <9; n++) {
             switch(n)
             {
                 case 1: //namecheck
-                    if (name == null) {
+                    if (resident.getUserName() == null) {
                         Toast.makeText(RegisterActivity.this, "Your name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -137,7 +142,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 2://profilenamecheck
-                    if (profileName == null) {
+                    if (resident.getUserProfileName() == null) {
                         Toast.makeText(RegisterActivity.this, "Your Profile name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -145,7 +150,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 3: //IcNocheck
-                    if (IcNo.length() != 12) {
+                    if (resident.getUserIC().length() != 12) {
                         Toast.makeText(RegisterActivity.this, "Please ensure your Ic No is correct",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -153,7 +158,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 4: //phoneNoCheck
-                    if (phoneNo == null) {
+                    if (resident.getUserPhone() == null) {
                         Toast.makeText(RegisterActivity.this, "Your phone number cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -161,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 5: //passwordcheck
-                    if (password == null) {
+                    if (resident.getPassword() == null) {
                         Toast.makeText(RegisterActivity.this, "Your password cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -169,7 +174,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 6: //compare password and current password
-                    if (password == confirmPassword) {
+                    if (resident.getPassword() != confirmPassword) {
                         Toast.makeText(RegisterActivity.this, "Please make sure you type in the same password",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
@@ -177,6 +182,14 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         break;
                     }
                 case 7:
+                    if (resident.getFrontImage() == null || resident.getBackImage() == null) {
+                        Toast.makeText(RegisterActivity.this, "Please take picture for both side of IC",
+                                Toast.LENGTH_SHORT).show();
+                        check = 1;
+                        n = 7;
+                        break;
+                    }
+                case 8:
                     if(n == 0){
                         Toast.makeText(RegisterActivity.this, "Something Went Wrong, please try again",
                                 Toast.LENGTH_SHORT).show();
@@ -193,40 +206,48 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
-        List<String> imageList = null;
+        List<String> ICImage = null;
         if (intent != null)
         {
-            imageList = intent.getStringArrayListExtra("imageList");
+            ICImage = intent.getStringArrayListExtra("imageList");
         }
 
-        if (imageList != null)
-        {   viewPager.setVisibility(View.VISIBLE);
-            for (String imageString : imageList)
+            for (String imageString : ICImage)
             {
                 Uri imageurl = Uri.parse(imageString);
                 imagesUri.add(imageurl);
                 try {
-                    ComplaintImage complaintImage = new ComplaintImage();
-                    InputStream inputStream = getContentResolver().openInputStream(imageurl);
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    resident.setFrontImage(bitmap);
-
-
+                    if(IcFrontImage == null) {
+                        IcFrontImage.setImageURI(imageurl);
+                        //ComplaintImage complaintImage = new ComplaintImage();
+                        InputStream inputStream = getContentResolver().openInputStream(imageurl);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        resident.setFrontImage(bitmap);
+                    }
+                    else if(IcBackImage == null)
+                    {
+                        IcBackImage.setImageURI(imageurl);
+                        //ComplaintImage complaintImage = new ComplaintImage();
+                        InputStream inputStream = getContentResolver().openInputStream(imageurl);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        resident.setBackImage(bitmap);
+                    }
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
-            viewPagerAdapter = new ViewPagerAdapter(this, imagesUri);
-            // initializing the ViewPager Object adding the Adapter to the ViewPager
-            viewPager.setAdapter(viewPagerAdapter);
+
         }
-    }
+
 
     private void openCamera(View view) {
         cameraLauncher.launch(new Intent(this, CameraActivity.class));
+    }
+
+    public void GetICPhoto(View view) {
+        openCamera(view);
     }
 }
