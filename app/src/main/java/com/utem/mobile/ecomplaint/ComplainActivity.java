@@ -58,14 +58,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -138,10 +142,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         createNotificationChannel();
 
         // set string list into drop down menu
+        // set the first string in arr into txtView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 ComplainActivity.this,R.layout.complaint_category_dropdown_item, category
         );
-        // set the first string in arr into txtView
         txtCategory.setText(category[0]);
         txtCategory.setAdapter(arrayAdapter);
 
@@ -218,6 +222,9 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                sendLocalToDatabase();
            }
         }});
+        Executors.newSingleThreadExecutor().execute(()-> {
+            getCategory();
+        });
     }
 
     private void cameraResult(ActivityResult result) {
@@ -314,14 +321,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     @NonNull
     @Override
     public Loader<Integer> onCreateLoader(int id, @Nullable Bundle args) {
-        Loader<Integer> loader = null;
-        switch (id){
-            case 0:
-                loader = new ComplainLoader(this,complaint);
-                break;
-            case 1:
-                loader = new ComplainLoader(this,localComplaint);
-        }
         return new ComplainLoader(this, complaint);
     }
 
@@ -333,7 +332,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             if (data != null) {
                 status = data;
             }
-
             if (status == 1) {
                 Toast.makeText(this, "Submit successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, ForumActivity.class);
@@ -341,19 +339,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             } else {
                 Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
             }
-        } else if (loader.getId() == 1) {
-            int status = 0;
-            if (data != null) {
-                status = data;
-            }
-            if (status == 1) {
-
-                Toast.makeText(this, "Local complaint added", Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
-            }
         }
-
     }
 
     @Override
@@ -403,6 +389,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         complaint.setImageList(complaintImageList);
         complaint.setComplaintTitle(txtTitle.getText().toString());
         complaint.setComplaintDescription(txtDescription.getText().toString());
+
+        ComplaintCategory complaintCategory = new ComplaintCategory();
+        complaintCategory.setCategoryName(txtCategory.getText().toString());
+        complaint.setCategory(complaintCategory);
         Resident resident = new Resident();
 
         SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
@@ -524,6 +514,36 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void getCategory() {
+
+        try {
+            HttpsURLConnection connection = (HttpsURLConnection)
+                    new URL(this.getString(R.string.api_connect) + "/getCategory.jsp").openConnection();
+
+            connection.setRequestMethod("GET");
+
+            System.out.println(connection.getResponseCode());
+
+            if (connection.getResponseCode() == 200) {
+                JSONArray response = new JSONArray(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
+                category = new String[response.length()];
+                for (int i = 0; i < response.length(); i++) {
+                    category[i] = (response.getJSONObject(i).getString("CategoryName"));
+                }
+
+
+
+                runOnUiThread();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void runOnUiThread() {
+
     }
 
 }

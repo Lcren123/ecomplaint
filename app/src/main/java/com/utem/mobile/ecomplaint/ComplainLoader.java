@@ -74,7 +74,7 @@ public class ComplainLoader extends AsyncTaskLoader<Integer> {
             request.put("ComplaintStatus",complaint.getComplaintStatus());
             request.put("Username",complaint.getResident().getUserName());
             request.put("CategoryID",1);
-            //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
+            request.put("CategoryName",complaint.getCategory().getCategoryName());
 
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL(apiConnect + "/addComplaint.jsp").openConnection();
