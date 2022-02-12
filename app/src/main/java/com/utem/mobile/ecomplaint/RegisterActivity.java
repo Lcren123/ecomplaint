@@ -1,6 +1,7 @@
 package com.utem.mobile.ecomplaint;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -40,6 +40,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     private Button btnICBack, btnICFront;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
+
 
     @NonNull
     @Override

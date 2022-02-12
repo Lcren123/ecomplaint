@@ -6,9 +6,13 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.utem.mobile.ecomplaint.room.Complaint;
 
-@Database(entities = {Complaint.class},version = 1, exportSchema = false)
+import com.utem.mobile.ecomplaint.room.ComplaintCategoryRoom;
+import com.utem.mobile.ecomplaint.room.ComplaintImageRoom;
+import com.utem.mobile.ecomplaint.room.ComplaintRoom;
+import com.utem.mobile.ecomplaint.room.ResidentRoom;
+
+@Database(entities = {ComplaintRoom.class, ResidentRoom.class, ComplaintCategoryRoom.class, ComplaintImageRoom.class},version = 1, exportSchema = false)
 public abstract class ComplaintDatabase extends RoomDatabase {
 
     private static ComplaintDatabase instance;
@@ -23,4 +27,5 @@ public abstract class ComplaintDatabase extends RoomDatabase {
         }
         return instance;
     }
+
 }

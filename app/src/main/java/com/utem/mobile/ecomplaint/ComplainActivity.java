@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,11 +15,15 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -45,9 +50,14 @@ import com.utem.mobile.ecomplaint.model.ComplaintImage;
 import com.utem.mobile.ecomplaint.model.Resident;
 import com.utem.mobile.ecomplaint.model.User;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
+import com.utem.mobile.ecomplaint.room.ComplaintImageRoom;
+import com.utem.mobile.ecomplaint.room.ComplaintRoom;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -85,6 +95,8 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     String[] category = {"Construction Work Zones" ,"Drains, Gullies And Sewer" , "Pothole Or Other Surface Defects" , "Road Sign Or Marking" ,
             "Road Drainage Fault" , "Roadside Grass Cutting" , "Street Light Fault" , "Traffic Lights"};
     private ComplaintCategory complaintCategory;
+    private ComplaintViewModel complaintViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +121,9 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         complaint = new Complaint();
         complaintCategory= new ComplaintCategory();
         loaderManager = LoaderManager.getInstance(this);
+
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
+        complaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
 
         /*
         // initialize map fragment
@@ -371,7 +385,47 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
         complaint.setResident(resident);
 
-        loaderManager.initLoader(0, null, this);
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null) {
+            loaderManager.initLoader(0, null, this);
+        }else{
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+
+            ComplaintRoom complaintRoom = new ComplaintRoom();
+            complaintRoom.setComplaintTitle(complaint.getComplaintTitle());
+            complaintRoom.setComplaintDescription(complaint.getComplaintDescription());
+            complaintRoom.setComplaintLongitude(complaint.getComplaintLongitude());
+            complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
+            complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
+            complaintRoom.setComplaintDateTime(dtf.format(now));
+           // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
+            complaintRoom.setComplaintID(1);
+            complaintRoom.setConnectedToDatabase(false);
+
+            List<ComplaintImageRoom> images = null;
+            if(complaintImageList != null)
+                images = new ArrayList<>();
+
+            for(ComplaintImage image : complaintImageList){
+                ComplaintImageRoom roomImage = new ComplaintImageRoom();
+
+                Bitmap bitmap = image.getBitmap();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                Base64.Encoder encoder = Base64.getEncoder();
+                String encodeImage = encoder.encodeToString(byteArray);
+                roomImage.setImage(encodeImage);
+                images.add(roomImage);
+            }
+
+            complaintViewModel.addComplaint(complaintRoom,images);
+            Toast.makeText(this, "Added into room database", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 
