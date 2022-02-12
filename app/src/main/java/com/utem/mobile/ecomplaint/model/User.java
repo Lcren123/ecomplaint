@@ -9,6 +9,15 @@ public class User {
     private String userPhone;
     private String userStatus;
     private String role;
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public int getUserID() {
         return userID;

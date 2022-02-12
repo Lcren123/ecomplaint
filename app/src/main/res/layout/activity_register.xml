@@ -111,7 +111,19 @@
             android:importantForAutofill="no" />
 
     </GridLayout>
+    <TextView
+        android:text="Front/Back of IC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
+    <Button
+        android:id="@+id/btnGCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:drawableLeft="@drawable/ic_camera"
+        android:text="Camera" />
     <Button
         android:onClick="Register"
         android:layout_width="match_parent"
