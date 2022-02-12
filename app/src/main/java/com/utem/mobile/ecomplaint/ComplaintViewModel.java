@@ -45,10 +45,10 @@ public class ComplaintViewModel extends AndroidViewModel {
         return complaintLiveData;
     }
 
-    public List<Complaint> getLocalComplaints(){
+    public List<Complaint> getLocalComplaints() {
         List<Complaint> complaints = new ArrayList<>();
-        List<ComplaintRoom> complaintRooms = complaintManager.getLocalComplaint(false);
-        for(ComplaintRoom complaintRoom: complaintRooms){
+        List<ComplaintRoom> complaintRooms = complaintManager.getLocalComplaint(0);
+        for (ComplaintRoom complaintRoom : complaintRooms) {
             Complaint complaint = new Complaint();
             complaint.setComplaintTitle(complaintRoom.getComplaintTitle());
             complaint.setComplaintDescription(complaintRoom.getComplaintDescription());
@@ -61,9 +61,9 @@ public class ComplaintViewModel extends AndroidViewModel {
             complaintCategory.setComplaintCategoryID(complaintRoom.getCategoryID());
             complaint.setCategory(complaintCategory);
 
-            List<ComplaintImageRoom>imageRooms = complaintManager.getComplaintImages(complaintRoom.getComplaintID());
+            List<ComplaintImageRoom> imageRooms = complaintManager.getComplaintImages(complaintRoom.getComplaintID());
             List<ComplaintImage> images = new ArrayList<>();
-            for(ComplaintImageRoom roomImage:imageRooms){
+            for (ComplaintImageRoom roomImage : imageRooms) {
                 ComplaintImage complaintImage = new ComplaintImage();
                 //complaintImage.setBitmap();
                 String encodedImage = roomImage.getImage();
@@ -75,8 +75,10 @@ public class ComplaintViewModel extends AndroidViewModel {
             }
             complaint.setImageList(images);
             complaints.add(complaint);
+            complaintManager.upDateLocalFinish(true, complaintRoom.getComplaintID());
         }
         return complaints;
+
     }
 
     public void addAllComplaint(HashMap<ComplaintRoom,List<ComplaintImageRoom>> complaintMap){
