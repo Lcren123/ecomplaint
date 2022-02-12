@@ -1,13 +1,12 @@
 package com.utem.mobile.ecomplaint;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -21,7 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import com.utem.mobile.ecomplaint.model.ComplaintImage;
 import com.utem.mobile.ecomplaint.model.Resident;
+import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -229,7 +230,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
             }
 
         }
-
 
     private void openCamera(View view) {
         cameraLauncher.launch(new Intent(this, CameraActivity.class));

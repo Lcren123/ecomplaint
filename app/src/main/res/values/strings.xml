@@ -12,4 +12,8 @@
     <string name="confirm_password">Confirm password</string>
     <string name="next">Next</string>
     <string name="finish">Finish</string>
+    <string name="logout">logout</string>
+    <string name="welcome">welcome</string>
+    <string name="complaint">Complaint</string>
+    <string name="forum">forum</string>
 </resources>
