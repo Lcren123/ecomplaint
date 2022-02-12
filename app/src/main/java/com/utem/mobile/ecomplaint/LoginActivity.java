@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
                 SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
                 sharedPreferences.edit()
-                        .putString("token", token)
+                        .putString("Token", token)
                         .apply();
 
                 intent = new Intent(LoginActivity.this, MainActivity.class);

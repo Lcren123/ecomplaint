@@ -20,11 +20,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
 
         intent = new Intent(MainActivity.this, ComplainActivity.class);
+        startActivity(intent);
     }
 
     public void GoToForum(View view) {
         Intent intent = new Intent();
 
         intent = new Intent(MainActivity.this, ForumActivity.class);
+        startActivity(intent);
     }
 }
