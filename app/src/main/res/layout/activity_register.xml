@@ -112,19 +112,15 @@
             android:importantForAutofill="no" />
 
         <TextView
-            android:text="Front of IC"
+            android:text="Capture the front of IC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:paddingVertical="10dp"
             />
 
 
-        <Button
-            android:id="@+id/btnICFront"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Camera"
-            android:drawableLeft="@drawable/ic_camera"
-            />
+
     </GridLayout>
 
 
@@ -145,17 +141,11 @@
             android:rowCount="1">
 
     <TextView
-        android:text="Back of IC"
+        android:text="Capture the back of IC"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btnICBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Camera"
-            android:drawableLeft="@drawable/ic_camera"
-            />
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:paddingVertical="10dp"/>
 
         </GridLayout>
 
@@ -173,6 +163,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:layout_marginVertical="20dp"
         android:text= "@string/next"/>
 
     </LinearLayout>

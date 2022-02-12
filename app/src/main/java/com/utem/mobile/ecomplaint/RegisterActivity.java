@@ -1,7 +1,8 @@
 package com.utem.mobile.ecomplaint;
 
 import android.Manifest;
-import android.content.ClipData;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -35,8 +35,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     private LoaderManager loaderManager;
     private Resident resident;
     private ImageView IcFrontImage, IcBackImage;
-    private Button btnICBack, btnICFront;
-
+    private AlertDialog.Builder builder;
     private ActivityResultLauncher<Intent> cameraLauncher;
 
 
@@ -89,25 +88,68 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         IcFrontImage = findViewById(R.id.FrontIC);
         IcBackImage = findViewById(R.id.BackIC);
 
-        btnICBack = findViewById(R.id.btnICBack);
-        btnICFront= findViewById(R.id.btnICFront);
+        builder = new AlertDialog.Builder(this);
 
         // capture back ic photo
-        btnICFront.setOnClickListener(v->askCameraPermission(IC_FRONT_CODE));
-        btnICBack.setOnClickListener(v->askCameraPermission(IC_BACK_CODE));
+        IcFrontImage.setOnClickListener(v->askCameraPermission(IC_FRONT_CODE));
+        IcBackImage.setOnClickListener(v->askCameraPermission(IC_BACK_CODE));
 
-        IcFrontImage.setOnClickListener(v->removePhoto(IC_FRONT_CODE));
-        IcBackImage.setOnClickListener(v->removePhoto(IC_BACK_CODE));
+        // long click to remove photo
+        IcFrontImage.setOnLongClickListener(v -> {
+            checkImageExist(IC_FRONT_CODE);
+            return false;
+        });
+        IcBackImage.setOnLongClickListener(v -> {
+            checkImageExist(IC_BACK_CODE);
+            return false;
+        });
     }
 
+    private void checkImageExist(int requestCode) {
+        if ((requestCode==IC_FRONT_CODE && resident.getFrontImage()!=null)||
+                (requestCode==IC_BACK_CODE && resident.getBackImage()!=null))
+            displayAlertDialog(requestCode);
+    }
+
+    // display msg to allow remove photo
+    private void displayAlertDialog(int requestCode) {
+
+        //Setting message manually and performing action on button click
+        builder.setMessage("Do you want to remove this image ?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        removePhoto(requestCode);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //  Action for 'NO' Button
+                        dialog.cancel();
+                    }
+                });
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        //Setting the title manually
+        alert.setTitle("Remove Image");
+        alert.show();
+    }
+
+    // remove image from image view and reset the icon into it
     private void removePhoto(int requestCode) {
+
+        int imageResource = getResources().getIdentifier("@drawable/ic_addphoto", null, getPackageName());
         if (requestCode==IC_FRONT_CODE && resident.getFrontImage()!=null){
-            int imageResource = getResources().getIdentifier("@drawable/ic_addphoto", null, getPackageName());
             Drawable drawable = getResources().getDrawable(imageResource,getTheme());
             IcFrontImage.setImageDrawable(drawable);
+            resident.setFrontImage(null);
         }
-        else if (requestCode==IC_BACK_CODE && resident.getBackImage()!=null)
-            IcBackImage.setImageDrawable(null);
+        else if (requestCode==IC_BACK_CODE && resident.getBackImage()!=null){
+            Drawable drawable = getResources().getDrawable(imageResource,getTheme());
+            IcBackImage.setImageDrawable(drawable);
+            resident.setBackImage(null);
+        }
+
     }
 
     private void askCameraPermission(int requestCode) {
@@ -136,8 +178,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode== CAMERA_PERM_CODE){
-            takeICBackPhoto();
+
+        }else if(requestCode==IC_FRONT_CODE){
+            // if permission is given
             takeICFrontPhoto();
+        }else if (requestCode==IC_BACK_CODE) {
+            takeICBackPhoto();
         }else{
             // if permission is refused
             Toast.makeText(this,"Camera Permission is required to capture IC.",Toast.LENGTH_SHORT).show();
@@ -149,13 +195,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         super.onActivityResult(requestCode, resultCode, data);
 
         // insert ic photo to resident obj & imageview
-        if (requestCode== IC_FRONT_CODE){
+        if (requestCode== IC_FRONT_CODE && data != null){
             Bitmap image = (Bitmap) data.getExtras().get("data");
             IcFrontImage.setImageBitmap(image);
             resident.setFrontImage(image);
 
         }
-        else if (requestCode== IC_BACK_CODE){
+        else if (requestCode== IC_BACK_CODE && data != null){
             Bitmap image = (Bitmap) data.getExtras().get("data");
             IcBackImage.setImageBitmap(image);
             resident.setBackImage(image);
@@ -176,7 +222,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtConfirmPassword.setEnabled(false);
 
 
-        RegisterCheck(resident, txtConfirmPassword.getText().toString());
+        registerCheck(resident, txtConfirmPassword.getText().toString());
 
     }
 
@@ -195,7 +241,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtConfirmPassword.setEnabled(true);
     }
 
-    public void RegisterCheck(Resident resident, String confirmPassword){
+    public void registerCheck(Resident resident, String confirmPassword){
         int n, check = 0;
         //nameCheck
 

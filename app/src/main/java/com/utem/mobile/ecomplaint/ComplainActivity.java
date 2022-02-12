@@ -125,20 +125,12 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
         complaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
 
-        /*
-        // initialize map fragment
-        Fragment fragment = new MapFragment();
-
-        // open fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameLayoutMap,fragment)
-                .commit();*/
 
         // set string list into drop down menu
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 ComplainActivity.this,R.layout.complaint_category_dropdown_item, category
         );
+
         // set the first string in arr into txtView
         txtCategory.setText(category[0]);
         txtCategory.setAdapter(arrayAdapter);
