@@ -198,7 +198,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
         btnSubmit.setOnClickListener(this::submitComplaint);
 
-
     }
 
 
