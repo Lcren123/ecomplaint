@@ -44,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.086"
-            app:srcCompat="@mipmap/complaintImg" />
+            app:srcCompat="@mipmap/complaint_foreground" />
 
         <TextView
             android:id="@+id/illegalText"
@@ -66,11 +66,11 @@
             android:onClick="GoToForum"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.821"
+            app:layout_constraintHorizontal_bias="0.85"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.092"
-            app:srcCompat="@mipmap/forum" />
+            app:layout_constraintVertical_bias="0.15"
+            app:srcCompat="@mipmap/forum_foreground" />
 
         <TextView
             android:id="@+id/textView7"
