@@ -58,14 +58,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -138,6 +142,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         createNotificationChannel();
 
         // set string list into drop down menu
+        // set the first string in arr into txtView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 ComplainActivity.this,R.layout.complaint_category_dropdown_item, category
         );
@@ -220,7 +225,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
            }
         }});
     }
-
 
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
@@ -355,6 +359,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
 
     @Override
@@ -422,8 +427,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         if(networkInfo != null) {
             loaderManager.initLoader(0, null, this);
         }else{
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
 
             ComplaintRoom complaintRoom = new ComplaintRoom();
             complaintRoom.setComplaintTitle(complaint.getComplaintTitle());
@@ -431,9 +434,9 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             complaintRoom.setComplaintLongitude(complaint.getComplaintLongitude());
             complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
             complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
-            complaintRoom.setComplaintDateTime(dtf.format(now));
+            complaintRoom.setUsername(username);
            // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
-            complaintRoom.setComplaintID(1);
+          //  complaintRoom.setComplaintID(1);
             complaintRoom.setConnectedToDatabase(false);
 
             List<ComplaintImageRoom> images = null;
