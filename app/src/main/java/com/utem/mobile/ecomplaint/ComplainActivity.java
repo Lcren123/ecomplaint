@@ -15,6 +15,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,11 +40,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.utem.mobile.ecomplaint.model.Complaint;
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
+import com.utem.mobile.ecomplaint.model.User;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class ComplainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
@@ -328,6 +331,13 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         complaint.setImageList(complaintImageList);
         complaint.setComplaintTitle(txtTitle.getText().toString());
         complaint.setComplaintDescription(txtDescription.getText().toString());
+        User user = new User();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
+        String token = sharedPreferences.getString("Token",null);
+        Base64.Decoder decoder = Base64.getDecoder();
+        System.out.println(decoder.decode(token).toString());
+        user.setUserName("");
 
         loaderManager.initLoader(0, null, this);
 

@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -72,10 +75,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public void login(View view) {
-        txtName.setEnabled(false);
-        txtPassword.setEnabled(false);
-        loaderManager.initLoader(1, null, this);
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
+        if (networkInfo != null) {
+            txtName.setEnabled(false);
+            txtPassword.setEnabled(false);
+            loaderManager.initLoader(1, null, this);
+        }else{
+            Toast.makeText(this, "INTERNET NOT AVAILABLE", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void Register(View view) {

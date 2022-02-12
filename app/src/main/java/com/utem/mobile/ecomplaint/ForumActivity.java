@@ -8,7 +8,10 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 
@@ -31,7 +34,15 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
         setContentView(R.layout.activity_forum);
 
         loaderManager = LoaderManager.getInstance(this);
-        loaderManager.initLoader(1,null,this);
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null) {
+            loaderManager.initLoader(1, null, this);
+        }else{
+
+        }
     }
 
     @NonNull
