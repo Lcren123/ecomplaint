@@ -84,4 +84,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         intent = new Intent(LoginActivity.this, ComplainActivity.class);
         startActivity(intent);
     }
+
+    public void forum(View view) {
+        Intent intent = null;
+        intent = new Intent(this, ForumActivity.class);
+        startActivity(intent);
+    }
 }

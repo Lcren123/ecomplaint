@@ -15,14 +15,14 @@ import java.util.List;
 
 public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecyclerViewAdapter.ViewHolder> {
 
-    private List<String> complaint;
+    private List<Complaint> complaints;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // data is passed into the constructor
-    ForumRecyclerViewAdapter(Context context, List<String> data) {
+    ForumRecyclerViewAdapter(Context context, List<Complaint> data) {
         this.mInflater = LayoutInflater.from(context);
-        this.complaint = data;
+        this.complaints = data;
     }
     // inflates the row layout from xml when needed
     @Override
@@ -31,21 +31,19 @@ public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecycler
         return new ViewHolder(view);
     }
 
-
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        //get data
-        //String forum = complaint.get(position);
+        if(complaints != null)
+            holder.setComplaint(complaints.get(position));
 
-        // holder.id.setText(forum);
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return complaint.size();
+        return complaints != null ? 0 : complaints.size();
     }
 
 
@@ -63,35 +61,32 @@ public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecycler
             itemView.setOnClickListener(this);
         }
         public void setComplaint (Complaint complaint){
-            id.setText(complaint.getComplaintID());
+            id.setText(Integer.toString(complaint.getComplaintID()));
             title.setText(complaint.getComplaintTitle());
             time.setText(complaint.getComplaintDateTime());
-
-
+            image.setImageBitmap(complaint.getImageList().get(0).getBitmap());
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null)
                 mClickListener.onItemClick(view, getAdapterPosition());
-
         }
     }
 
     // convenience method for getting data at click position
-    String getItem(int id) {
-        return complaint.get(id);
+    Complaint getItem(int id) {
+        return complaints.get(id);
     }
 
     // allows clicks events to be caught
     void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
+        //this.mClickListener = itemClickListener;
     }
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
-
     }
 }
 

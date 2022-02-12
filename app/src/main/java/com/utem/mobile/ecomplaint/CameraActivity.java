@@ -111,8 +111,6 @@ public class CameraActivity extends AppCompatActivity {
             // For querying information and states.
             CameraInfo cameraInfo = camera.getCameraInfo();
 
-
-
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
