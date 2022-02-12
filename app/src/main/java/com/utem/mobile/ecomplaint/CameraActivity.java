@@ -108,6 +108,7 @@ public class CameraActivity extends AppCompatActivity {
 
             // For performing operations that affect all outputs.
             CameraControl cameraControl = camera.getCameraControl();
+
             // For querying information and states.
             CameraInfo cameraInfo = camera.getCameraInfo();
 
