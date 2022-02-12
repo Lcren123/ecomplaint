@@ -9,11 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,12 +42,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.utem.mobile.ecomplaint.model.Complaint;
 import com.utem.mobile.ecomplaint.model.ComplaintCategory;
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
+import com.utem.mobile.ecomplaint.model.Resident;
+import com.utem.mobile.ecomplaint.model.User;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Base64;
 import java.util.List;
 
 public class ComplainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
@@ -356,6 +360,17 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         complaint.setImageList(complaintImageList);
         complaint.setComplaintTitle(txtTitle.getText().toString());
         complaint.setComplaintDescription(txtDescription.getText().toString());
+        Resident resident = new Resident();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
+        String token = sharedPreferences.getString("Token",null);
+        System.out.println(token);
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] bytes = decoder.decode(token);
+        String username = new String(bytes);
+        resident.setUserName(username);
+
+        complaint.setResident(resident);
 
         loaderManager.initLoader(0, null, this);
 

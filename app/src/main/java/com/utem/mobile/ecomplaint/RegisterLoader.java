@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
+import com.utem.mobile.ecomplaint.model.Resident;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -18,16 +20,13 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class RegisterLoader extends AsyncTaskLoader<Bundle> {
 
-    private final String name, profileName, IcNo, phoneNo, password, apiConnect;
+    private final Resident resident;
+    private final String apiConnect;
 
 
-    public RegisterLoader(@NonNull Context context, String name, String profileName, String IcNo, String phoneNo, String password) {
+    public RegisterLoader(@NonNull Context context, Resident newResident) {
         super(context);
-        this.name = name;
-        this.profileName = profileName;
-        this.IcNo = IcNo;
-        this.phoneNo = phoneNo;
-        this.password = password;
+      this.resident = newResident;
         this.apiConnect = context.getString(R.string.api_connect);
     }
 
@@ -45,12 +44,13 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
             JSONObject request = new JSONObject();
             String token = null;
 
-            request.put("UserName", name);
-            request.put("UserPassword", password);
-            request.put("UserIC", IcNo);
-            request.put("UserPhone",phoneNo);
-            request.put("UserProfileName",profileName);
+            request.put("UserName", resident.getUserName());
+            request.put("UserPassword", resident.getPassword());
+            request.put("UserIC", resident.getUserIC());
+            request.put("UserPhone",resident.getUserPhone());
+            request.put("UserProfileName",resident.getUserProfileName());
             request.put("Role","resident");
+
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL(apiConnect + "/register.jsp").openConnection();
 

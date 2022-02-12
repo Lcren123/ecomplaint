@@ -72,8 +72,7 @@ public class ComplainLoader extends AsyncTaskLoader<Integer> {
             request.put("ComplaintLongitude",complaint.getComplaintLongitude());
             request.put("ComplaintLatitude",complaint.getComplaintLatitude());
             request.put("ComplaintStatus",complaint.getComplaintStatus());
-            //request.put("ResidentID",complaint.getResident().getResidentID());
-            request.put("ResidentID",1);
+            request.put("Username",complaint.getResident().getUserName());
             request.put("CategoryID",1);
             //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
 
