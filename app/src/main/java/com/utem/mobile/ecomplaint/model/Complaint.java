@@ -16,8 +16,7 @@ public class Complaint {
     private double complaintLatitude;
     private String complaintStatus="Pending";
     private String complaintDateTime;
-    List <ComplaintImage> imageList;
-
+    private List <ComplaintImage> imageList;
 
     public ComplaintCategory getCategory() {
         return category;

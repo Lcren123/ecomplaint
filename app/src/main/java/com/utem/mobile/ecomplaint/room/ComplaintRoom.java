@@ -3,14 +3,8 @@ package com.utem.mobile.ecomplaint.room;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.utem.mobile.ecomplaint.model.ComplaintCategory;
-import com.utem.mobile.ecomplaint.model.ComplaintImage;
-import com.utem.mobile.ecomplaint.model.Resident;
-
-import java.util.List;
-
 @Entity
-public class Complaint {
+public class ComplaintRoom {
 
     private int categoryID;
     private String username;
@@ -23,6 +17,15 @@ public class Complaint {
     private double complaintLatitude;
     private String complaintStatus;
     private String complaintDateTime;
+    private boolean isConnectedToDatabase;
+
+    public boolean isConnectedToDatabase() {
+        return isConnectedToDatabase;
+    }
+
+    public void setConnectedToDatabase(boolean connectedToDatabase) {
+        isConnectedToDatabase = connectedToDatabase;
+    }
 
     public int getCategoryID() {
         return categoryID;

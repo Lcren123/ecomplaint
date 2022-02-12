@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:rowCount="3"
+        android:rowCount="4"
         android:orientation="horizontal"
         android:padding="10dp"
         >
@@ -54,6 +54,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
+            android:text="Category" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:id="@+id/txtInputLytCategory"
+            android:layout_width="326dp"
+            android:layout_height="match_parent"
+            android:minHeight="48dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/txtCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:paddingVertical="10dp"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:text="Image" />
 
         <LinearLayout
@@ -79,6 +104,9 @@
                 android:text="Camera" />
 
         </LinearLayout>
+
+
+
 
     </GridLayout>
 

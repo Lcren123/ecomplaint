@@ -7,23 +7,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -37,26 +43,34 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.utem.mobile.ecomplaint.model.Complaint;
+import com.utem.mobile.ecomplaint.model.ComplaintCategory;
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
 import com.utem.mobile.ecomplaint.model.Resident;
 import com.utem.mobile.ecomplaint.model.User;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
+import com.utem.mobile.ecomplaint.room.ComplaintImageRoom;
+import com.utem.mobile.ecomplaint.room.ComplaintRoom;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
 public class ComplainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
 
+    private TextInputLayout txtInputLytCategory;
+    private AutoCompleteTextView txtCategory;
     private Button btnSubmit, btnGallery, btnCamera;
     private EditText txtTitle, txtDescription;
     private TextView txtLocation;
 
+    // creating obj for photo
     private List<Uri> imagesUri;
     private LoaderManager loaderManager;
 
@@ -77,6 +91,12 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
+    // obj for drop down menu
+    String[] category = {"Construction Work Zones" ,"Drains, Gullies And Sewer" , "Pothole Or Other Surface Defects" , "Road Sign Or Marking" ,
+            "Road Drainage Fault" , "Roadside Grass Cutting" , "Street Light Fault" , "Traffic Lights"};
+    private ComplaintCategory complaintCategory;
+    private ComplaintViewModel complaintViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +107,10 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         txtDescription = findViewById(R.id.txtDescription);
         txtLocation = findViewById(R.id.txtLocation);
 
+        // for drop down menu
+        txtInputLytCategory = findViewById(R.id.txtInputLytCategory);
+        txtCategory = findViewById(R.id.txtCategory);
+
         btnSubmit = findViewById(R.id.btnSubmit);
         btnGallery = findViewById(R.id.btnGallery);
         viewPager = findViewById(R.id.viewPager);
@@ -95,8 +119,11 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         imagesUri = new ArrayList<>();
         complaintImageList = new ArrayList<>();
         complaint = new Complaint();
+        complaintCategory= new ComplaintCategory();
         loaderManager = LoaderManager.getInstance(this);
+
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
+        complaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
 
         /*
         // initialize map fragment
@@ -107,6 +134,21 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 .beginTransaction()
                 .replace(R.id.frameLayoutMap,fragment)
                 .commit();*/
+
+        // set string list into drop down menu
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                ComplainActivity.this,R.layout.complaint_category_dropdown_item, category
+        );
+        // set the first string in arr into txtView
+        txtCategory.setText(category[0]);
+        txtCategory.setAdapter(arrayAdapter);
+
+        txtCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                complaintCategory.setCategoryName( arrayAdapter.getItem(position));
+            }
+        });
 
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
         client = LocationServices.getFusedLocationProviderClient(this);
@@ -194,7 +236,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                     complaintImage.setBitmap(bitmap);
                     complaintImageList.add(complaintImage);
-
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -345,7 +386,47 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
         complaint.setResident(resident);
 
-        loaderManager.initLoader(0, null, this);
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null) {
+            loaderManager.initLoader(0, null, this);
+        }else{
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+
+            ComplaintRoom complaintRoom = new ComplaintRoom();
+            complaintRoom.setComplaintTitle(complaint.getComplaintTitle());
+            complaintRoom.setComplaintDescription(complaint.getComplaintDescription());
+            complaintRoom.setComplaintLongitude(complaint.getComplaintLongitude());
+            complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
+            complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
+            complaintRoom.setComplaintDateTime(dtf.format(now));
+           // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
+            complaintRoom.setComplaintID(1);
+            complaintRoom.setConnectedToDatabase(false);
+
+            List<ComplaintImageRoom> images = null;
+            if(complaintImageList != null)
+                images = new ArrayList<>();
+
+            for(ComplaintImage image : complaintImageList){
+                ComplaintImageRoom roomImage = new ComplaintImageRoom();
+
+                Bitmap bitmap = image.getBitmap();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                Base64.Encoder encoder = Base64.getEncoder();
+                String encodeImage = encoder.encodeToString(byteArray);
+                roomImage.setImage(encodeImage);
+                images.add(roomImage);
+            }
+
+            complaintViewModel.addComplaint(complaintRoom,images);
+            Toast.makeText(this, "Added into room database", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 
