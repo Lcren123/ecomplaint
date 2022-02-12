@@ -27,7 +27,7 @@ public abstract class ComplaintManager {
     public abstract List<ComplaintImageRoom> getComplaintImages(int complaintID);
 
     @Query("SELECT * FROM ComplaintRoom WHERE isConnectedToDatabase = :isConnectedToDatabase")
-    public abstract List<ComplaintRoom> getLocalComplaint(boolean isConnectedToDatabase);
+    public abstract List<ComplaintRoom> getLocalComplaint(int isConnectedToDatabase);
 
     @Query("UPDATE ComplaintRoom SET isConnectedToDatabase = :isConnectedToDatabase WHERE complaintID = :complaintID")
     public abstract void upDateLocalFinish(boolean isConnectedToDatabase, int complaintID);
@@ -40,7 +40,7 @@ public abstract class ComplaintManager {
 
     @Transaction
     public void addComplaintAndImage(ComplaintRoom complaint, List<ComplaintImageRoom> images){
-        long complaintID = addComplaint(complaint);
+        long complaintID =  addComplaint(complaint);
         for(ComplaintImageRoom image: images){
             image.setComplaintID((int)complaintID);
             addComplaintImage(image);

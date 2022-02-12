@@ -7,13 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +24,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -48,11 +50,14 @@ import com.utem.mobile.ecomplaint.model.Complaint;
 import com.utem.mobile.ecomplaint.model.ComplaintCategory;
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
 import com.utem.mobile.ecomplaint.model.Resident;
-import com.utem.mobile.ecomplaint.model.User;
 import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 import com.utem.mobile.ecomplaint.room.ComplaintImageRoom;
 import com.utem.mobile.ecomplaint.room.ComplaintRoom;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -61,6 +66,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class ComplainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
 
@@ -78,6 +87,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     private int position = 0;
     private List<ComplaintImage> complaintImageList;
     private Complaint complaint;
+    private Complaint localComplaint;
 
     // creating object of ViewPager for photo
     private ViewPager viewPager;
@@ -125,15 +135,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
         complaintViewModel = new ViewModelProvider(this).get(ComplaintViewModel.class);
 
-        /*
-        // initialize map fragment
-        Fragment fragment = new MapFragment();
-
-        // open fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameLayoutMap,fragment)
-                .commit();*/
+        createNotificationChannel();
 
         // set string list into drop down menu
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
@@ -143,12 +145,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         txtCategory.setText(category[0]);
         txtCategory.setAdapter(arrayAdapter);
 
-        txtCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                complaintCategory.setCategoryName( arrayAdapter.getItem(position));
-            }
-        });
+        txtCategory.setOnItemClickListener((parent, view, position, id) -> complaintCategory.setCategoryName( arrayAdapter.getItem(position)));
 
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
         client = LocationServices.getFusedLocationProviderClient(this);
@@ -186,34 +183,42 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         btnCamera.setOnClickListener(this::openCamera);
 
         // click button to select image from gallery
-        btnGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnGallery.setOnClickListener(v -> {
 
-                if (ActivityCompat.checkSelfPermission(ComplainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(ComplainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat.requestPermissions(ComplainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
-                    return;
+                ActivityCompat.requestPermissions(ComplainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+                return;
 
-                }
-                // initialising intent
-                Intent intent = new Intent();
-
-                // setting type to select to be image
-                intent.setType("image/*");
-
-                // allowing multiple image to be selected
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PHOTO_FROM_GALLERY);
             }
+            // initialising intent
+            Intent intent = new Intent();
+
+            // setting type to select to be image
+            intent.setType("image/*");
+
+            // allowing multiple image to be selected
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PHOTO_FROM_GALLERY);
         });
 
         btnSubmit.setOnClickListener(this::submitComplaint);
 
-    }
+        Executors.newSingleThreadExecutor().execute(()-> {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
+        if(networkInfo != null){
+            List<Complaint> complaints = complaintViewModel.getLocalComplaints();
+            System.out.println(complaints.size());
+           for(Complaint complaint: complaints){
+               localComplaint = complaint;
+               sendLocalToDatabase();
+           }
+        }});
+    }
 
     private void cameraResult(ActivityResult result) {
         Intent intent = result.getData();
@@ -309,24 +314,46 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
     @NonNull
     @Override
     public Loader<Integer> onCreateLoader(int id, @Nullable Bundle args) {
+        Loader<Integer> loader = null;
+        switch (id){
+            case 0:
+                loader = new ComplainLoader(this,complaint);
+                break;
+            case 1:
+                loader = new ComplainLoader(this,localComplaint);
+        }
         return new ComplainLoader(this, complaint);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Integer> loader, Integer data) {
         loaderManager.destroyLoader(loader.getId());
-        int status = 0;
-        if(data != null) {
-            status = data;
+        if(loader.getId() == 0) {
+            int status = 0;
+            if (data != null) {
+                status = data;
+            }
+
+            if (status == 1) {
+                Toast.makeText(this, "Submit successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, ForumActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
+            }
+        } else if (loader.getId() == 1) {
+            int status = 0;
+            if (data != null) {
+                status = data;
+            }
+            if (status == 1) {
+
+                Toast.makeText(this, "Local complaint added", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
+            }
         }
 
-        if (status == 1) {
-            Toast.makeText(this, "Submit successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, ForumActivity.class);
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Something error", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
@@ -394,8 +421,6 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         if(networkInfo != null) {
             loaderManager.initLoader(0, null, this);
         }else{
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
 
             ComplaintRoom complaintRoom = new ComplaintRoom();
             complaintRoom.setComplaintTitle(complaint.getComplaintTitle());
@@ -403,9 +428,9 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             complaintRoom.setComplaintLongitude(complaint.getComplaintLongitude());
             complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
             complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
-            complaintRoom.setComplaintDateTime(dtf.format(now));
+            complaintRoom.setUsername(username);
            // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
-            complaintRoom.setComplaintID(1);
+          //  complaintRoom.setComplaintID(1);
             complaintRoom.setConnectedToDatabase(false);
 
             List<ComplaintImageRoom> images = null;
@@ -430,6 +455,75 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
         }
 
+    }
+
+    private void createNotificationChannel() {
+        CharSequence name = "channel";
+        String description = "channel";
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel("1",name,importance);
+        channel.setDescription(description);
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+    }
+
+    public void sendLocalToDatabase(){
+        try {
+            JSONObject request = new JSONObject();
+
+            List<ComplaintImage> images = localComplaint.getImageList();
+            List<String> encodedImages = null;
+
+            if(images != null)
+                encodedImages = new ArrayList<>();
+            for(ComplaintImage image : images){
+                Bitmap bitmap = image.getBitmap();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                Base64.Encoder encoder = Base64.getEncoder();
+                String encodeImage = encoder.encodeToString(byteArray);
+                encodedImages.add(encodeImage);
+            }
+            JSONArray imagesJSON = new JSONArray(encodedImages);
+            request.put("imageList",imagesJSON);
+            request.put("ComplaintTitle",localComplaint.getComplaintTitle());
+            request.put("ComplaintDescription",localComplaint.getComplaintDescription());
+            request.put("ComplaintLongitude",localComplaint.getComplaintLongitude());
+            request.put("ComplaintLatitude",localComplaint.getComplaintLatitude());
+            request.put("ComplaintStatus",localComplaint.getComplaintStatus());
+            //TODO::
+            //request.put("Username",complaint.getResident().getUserName());
+            request.put("Username","resident");
+
+            request.put("CategoryID",1);
+            //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
+
+            HttpsURLConnection connection = (HttpsURLConnection)
+                    new URL(this.getString(R.string.api_connect) + "/addComplaint.jsp").openConnection();
+
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.getOutputStream().write(request.toString().getBytes());
+
+
+            System.out.println(connection.getResponseCode());
+            if (connection.getResponseCode() == 200) {
+                System.out.println("200");
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
+                        .setContentTitle("Local complaint updated")
+                        .setContentText("Your local complaint has been uploaded")
+                        .setSmallIcon(R.drawable.ic_baseline_notifications_24)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+                manager.notify(1,builder.build());
+            }
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
