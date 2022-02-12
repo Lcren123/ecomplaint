@@ -7,6 +7,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -32,18 +33,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         if (data != null) {
             Intent intent = null;
 
-            String token = data.getString("Token", null);
+            String token = data.getString("Token");
 
             if (token != null) {
-                Toast.makeText(LoginActivity.this, "login Success",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "login Success",Toast.LENGTH_SHORT).show();
+
+                SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
+                sharedPreferences.edit()
+                        .putString("token", token)
+                        .apply();
+
                 intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra("Token", token);
                 startActivity(intent);
+                finish();
             } else {
                 Toast.makeText(LoginActivity.this, "Username/password is incorrect",
                         Toast.LENGTH_SHORT).show();
-
             }
         }
     }
