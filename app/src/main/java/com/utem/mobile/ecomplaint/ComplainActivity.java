@@ -394,6 +394,9 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
     private void submitComplaint(View view) {
 
+        txtTitle.setEnabled(false);
+        txtDescription.setEnabled(false);
+        txtCategory.setEnabled(false);
         String strLocation []= txtLocation.getText().toString().split(",") ;
         complaint.setComplaintLatitude(Double.parseDouble(String.format("%.5f",Double.parseDouble(strLocation[0]))));
         complaint.setComplaintLongitude(Double.parseDouble(String.format("%.5f",Double.parseDouble(strLocation[1]))));
