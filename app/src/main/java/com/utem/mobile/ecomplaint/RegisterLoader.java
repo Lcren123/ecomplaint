@@ -50,9 +50,9 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
             request.put("UserIC", IcNo);
             request.put("UserPhone",phoneNo);
             request.put("UserProfileName",profileName);
-            request.put("UserProfileName","resident");
+            request.put("Role","resident");
             HttpsURLConnection connection = (HttpsURLConnection)
-                    new URL(apiConnect + "/login.jsp").openConnection();
+                    new URL(apiConnect + "/register.jsp").openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(true);
