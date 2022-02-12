@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
             if (token != null) {
                 Toast.makeText(RegisterActivity.this, "Register Success",
                         Toast.LENGTH_SHORT).show();
-                intent = new Intent(RegisterActivity.this, MainActivity.class);
+                intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 intent.putExtra("Token", token);
                 startActivity(intent);
             } else {
@@ -125,82 +126,72 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     public void RegisterCheck(Resident resident, String confirmPassword){
         int n, check = 0;
         //nameCheck
-        for(n=0; n <10; n++) {
-            switch(n)
-            {
-                case 1: //namecheck
+
                     if (resident.getUserName() == null) {
                         Toast.makeText(RegisterActivity.this, "Your name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
-                        break;
+                        retry();
                     }
-                case 2://profilenamecheck
-                    if (resident.getUserProfileName() == null) {
+
+                    else if (resident.getUserProfileName() == null) {
                         Toast.makeText(RegisterActivity.this, "Your Profile name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
-                        break;
+                        retry();
+
                     }
-                case 3: //IcNocheck
-                    if (resident.getUserIC().length() != 12) {
+
+                    else if  (resident.getUserIC().length() != 12) {
                         Toast.makeText(RegisterActivity.this, "Please ensure your Ic No is correct",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
-                        break;
+                        retry();
+
                     }
-                case 4: //phoneNoCheck
-                    if (resident.getUserPhone() == null) {
+
+                    else if  (resident.getUserPhone() == null) {
                         Toast.makeText(RegisterActivity.this, "Your phone number cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
-                        break;
+                        retry();
+
                     }
-                case 5: //passwordcheck
-                    if (resident.getPassword() == null) {
+
+                    else if  (resident.getPassword() == null) {
                         Toast.makeText(RegisterActivity.this, "Your password cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
-                        break;
+                        retry();
+
                     }
-                case 6: //compare password and current password
-                    if (resident.getPassword().equals(confirmPassword)) {
+
+                    else if  (resident.getPassword().equals(confirmPassword)) {
                         Toast.makeText(RegisterActivity.this, "Please make sure you type in the same password",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
+                        retry();
 
-                    }break;
-                case 7:
-                    if (resident.getFrontImage() == null || resident.getBackImage() == null) {
+                    }
+
+                    else if  (resident.getFrontImage() == null || resident.getBackImage() == null) {
                         Toast.makeText(RegisterActivity.this, "Please take picture for both side of IC",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 9;
+                        retry();
+                    }
+                    else
+                        loaderManager.initLoader(1, null, this);
 
-                    }break;
-                case 8:
-                    loaderManager.initLoader(1, null, this);
-                case 9:
 
-                    break;
-            }
-            if(check == 1)
-                break;
-        }if(check == 0){
+       /* if(check == 0){
             Toast.makeText(RegisterActivity.this, "Something Went Wrong, please try again",
                     Toast.LENGTH_SHORT).show();
             retry();
         }
         else if(check == 1)
-            retry();
-        else
-            check = 2;
+            retry();*/
+
     }
 
     private void cameraResult(ActivityResult result) {
