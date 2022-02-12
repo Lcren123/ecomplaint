@@ -18,7 +18,7 @@ public class SplashScreen extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
 
         Intent intent = null;
-        if(sharedPreferences.contains("token"))
+        if(sharedPreferences.contains("Token"))
             intent = new Intent(this,MainActivity.class);
         else
             intent = new Intent(this,LoginActivity.class);
