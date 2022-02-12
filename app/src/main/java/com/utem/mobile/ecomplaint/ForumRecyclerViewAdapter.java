@@ -71,7 +71,7 @@ public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecycler
 
         @SuppressLint("SetTextI18n")
         public void setComplaint (Complaint complaint){
-            id.setText(Integer.toString(complaint.getComplaintID()));
+            id.setText(complaint.getCategory().getCategoryName());
             title.setText(complaint.getComplaintTitle());
             time.setText(complaint.getComplaintDateTime());
             image.setImageBitmap(complaint.getImageList().get(0).getBitmap());

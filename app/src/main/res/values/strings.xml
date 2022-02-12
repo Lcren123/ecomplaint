@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ecomplaint</string>
+    <string name="app_name">E-Complaint</string>
     <string name="api_connect">https://fbc2-118-100-165-78.ngrok.io/e-complain</string>
     <string name="title">Title</string>
     <string name="name">Name</string>
@@ -12,5 +12,8 @@
     <string name="confirm_password">Confirm password</string>
     <string name="next">Next</string>
     <string name="finish">Finish</string>
-
+    <string name="logout">logout</string>
+    <string name="welcome">welcome</string>
+    <string name="complaint">Complaint</string>
+    <string name="forum">forum</string>
 </resources>

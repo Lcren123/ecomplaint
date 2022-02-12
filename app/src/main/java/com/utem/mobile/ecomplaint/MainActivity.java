@@ -29,4 +29,12 @@ public class MainActivity extends AppCompatActivity {
         intent = new Intent(MainActivity.this, ForumActivity.class);
         startActivity(intent);
     }
+
+    public void Logout(View view) {
+        Intent intent = new Intent();
+
+        intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+
+    }
 }

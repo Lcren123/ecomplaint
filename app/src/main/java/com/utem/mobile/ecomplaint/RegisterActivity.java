@@ -1,39 +1,41 @@
 package com.utem.mobile.ecomplaint;
 
+import android.Manifest;
+import android.content.ClipData;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
 import com.utem.mobile.ecomplaint.model.Resident;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.List;
-
 public class RegisterActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Bundle> {
 
+    private static final int CAMERA_PERM_CODE = 1 ;
+    private static final int IC_BACK_CODE = 101;
+    private static final int IC_FRONT_CODE = 102;
     private EditText txtName, txtPassword,txtConfirmPassword, IcNo, txtProfileName, phoneNo;
-    private List<Uri> imagesUri;
+
     private LoaderManager loaderManager;
     private Resident resident;
     private ImageView IcFrontImage, IcBackImage;
+    private Button btnICBack, btnICFront;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
@@ -83,11 +85,81 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         phoneNo = findViewById(R.id.editPhoneNo);
         txtPassword = findViewById(R.id.editPassword);
         txtConfirmPassword = findViewById(R.id.editConfirmPassword);
-        Resident resident = new Resident();
+        resident = new Resident();
         IcFrontImage = findViewById(R.id.FrontIC);
         IcBackImage = findViewById(R.id.BackIC);
-        cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::cameraResult);
 
+        btnICBack = findViewById(R.id.btnICBack);
+        btnICFront= findViewById(R.id.btnICFront);
+
+        // capture back ic photo
+        btnICFront.setOnClickListener(v->askCameraPermission(IC_FRONT_CODE));
+        btnICBack.setOnClickListener(v->askCameraPermission(IC_BACK_CODE));
+
+        IcFrontImage.setOnClickListener(v->removePhoto(IC_FRONT_CODE));
+        IcBackImage.setOnClickListener(v->removePhoto(IC_BACK_CODE));
+    }
+
+    private void removePhoto(int requestCode) {
+        if (requestCode==IC_FRONT_CODE && resident.getFrontImage()!=null){
+            int imageResource = getResources().getIdentifier("@drawable/ic_addphoto", null, getPackageName());
+            Drawable drawable = getResources().getDrawable(imageResource,getTheme());
+            IcFrontImage.setImageDrawable(drawable);
+        }
+        else if (requestCode==IC_BACK_CODE && resident.getBackImage()!=null)
+            IcBackImage.setImageDrawable(null);
+    }
+
+    private void askCameraPermission(int requestCode) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},CAMERA_PERM_CODE);
+        }else if(requestCode==IC_FRONT_CODE){
+            // if permission is given
+            takeICFrontPhoto();
+        }else {
+            takeICBackPhoto();
+        }
+
+    }
+
+    private void takeICFrontPhoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, IC_FRONT_CODE);
+    }
+
+    private void takeICBackPhoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, IC_BACK_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode== CAMERA_PERM_CODE){
+            takeICBackPhoto();
+            takeICFrontPhoto();
+        }else{
+            // if permission is refused
+            Toast.makeText(this,"Camera Permission is required to capture IC.",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // insert ic photo to resident obj & imageview
+        if (requestCode== IC_FRONT_CODE){
+            Bitmap image = (Bitmap) data.getExtras().get("data");
+            IcFrontImage.setImageBitmap(image);
+            resident.setFrontImage(image);
+
+        }
+        else if (requestCode== IC_BACK_CODE){
+            Bitmap image = (Bitmap) data.getExtras().get("data");
+            IcBackImage.setImageBitmap(image);
+            resident.setBackImage(image);
+        }
     }
 
     public void Register(View view) {
@@ -194,48 +266,5 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
 
     }
 
-    private void cameraResult(ActivityResult result) {
-        Intent intent = result.getData();
-        List<String> ICImage = null;
-        if (intent != null)
-        {
-            ICImage = intent.getStringArrayListExtra("imageList");
-        }
 
-            for (String imageString : ICImage)
-            {
-                Uri imageurl = Uri.parse(imageString);
-                imagesUri.add(imageurl);
-                try {
-                    if(IcFrontImage == null) {
-                        IcFrontImage.setImageURI(imageurl);
-                        //ComplaintImage complaintImage = new ComplaintImage();
-                        InputStream inputStream = getContentResolver().openInputStream(imageurl);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        resident.setFrontImage(bitmap);
-                    }
-                    else if(IcBackImage == null)
-                    {
-                        IcBackImage.setImageURI(imageurl);
-                        //ComplaintImage complaintImage = new ComplaintImage();
-                        InputStream inputStream = getContentResolver().openInputStream(imageurl);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        resident.setBackImage(bitmap);
-                    }
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-
-    private void openCamera(View view) {
-        cameraLauncher.launch(new Intent(this, CameraActivity.class));
-    }
-
-    public void GetICPhoto(View view) {
-        openCamera(view);
-    }
 }
