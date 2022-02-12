@@ -23,7 +23,6 @@ public class Complaint {
     private double complaintLatitude;
     private String complaintStatus;
     private String complaintDateTime;
-    List <ComplaintImage> imageList;
 
     public int getCategoryID() {
         return categoryID;
@@ -94,14 +93,6 @@ public class Complaint {
     public void setComplaintDateTime(String complaintDateTime) {
         this.complaintDateTime = complaintDateTime;
     }
-    public List<ComplaintImage> getImageList() {
-        return imageList;
-    }
-
-    public void setImageList(List<ComplaintImage> imageList) {
-        this.imageList = imageList;
-    }
-
 
 }
 
