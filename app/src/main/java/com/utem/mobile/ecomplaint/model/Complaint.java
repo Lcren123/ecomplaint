@@ -1,7 +1,5 @@
 package com.utem.mobile.ecomplaint.model;
 
-import android.graphics.Bitmap;
-
 import java.util.List;
 
 public class Complaint {
