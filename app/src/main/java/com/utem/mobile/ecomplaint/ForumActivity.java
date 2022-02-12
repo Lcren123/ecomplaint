@@ -8,6 +8,7 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -16,7 +17,7 @@ import com.utem.mobile.ecomplaint.model.Complaint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Complaint>> {
+public class ForumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Complaint>>, ItemClickListener {
 
     private ArrayList<Complaint> forumList = new ArrayList<>();
     private LoaderManager loaderManager;
@@ -29,20 +30,8 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
 
-
         loaderManager = LoaderManager.getInstance(this);
         loaderManager.initLoader(1,null,this);
-
-       // adapter.setClickListener((ForumRecyclerViewAdapter.ItemClickListener) this);
-
-    }
-
-
-    public void onItemClick(View view, int position) {
-        Complaint num = adapter.getItem(position);
-        //Intent intent=new Intent(ForumActivity.this,ForumDetailActivity.class);
-        //startActivity(intent);
-
     }
 
     @NonNull
@@ -55,15 +44,23 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
     public void onLoadFinished(@NonNull Loader<List<Complaint>> loader, List<Complaint> data) {
         if(data != null){
             System.out.println("success");
+            System.out.println(data.size());
             recyclerView = findViewById(R.id.forum);
-            adapter = new ForumRecyclerViewAdapter(this, data);
+            adapter = new ForumRecyclerViewAdapter(this, data,this);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            System.out.println("finish");
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<List<Complaint>> loader) {
 
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
     }
 }
