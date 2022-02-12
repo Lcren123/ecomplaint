@@ -1,19 +1,8 @@
 package com.utem.mobile.ecomplaint;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
-import androidx.viewpager.widget.ViewPager;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -22,9 +11,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.utem.mobile.ecomplaint.model.ComplaintImage;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+
 import com.utem.mobile.ecomplaint.model.Resident;
-import com.utem.mobile.ecomplaint.model.ViewPagerAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -36,7 +32,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     private List<Uri> imagesUri;
     private LoaderManager loaderManager;
     private Resident resident;
-    private Button btnCamera;
     private ImageView IcFrontImage, IcBackImage;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
@@ -52,7 +47,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     public void onLoadFinished(@NonNull Loader<Bundle> loader, Bundle data) {
 
         if (data != null) {
-            Intent intent = null;
+            Intent intent;
             //System.out.println(data);
             String token = data.getString("Token", null);
 
@@ -130,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     public void RegisterCheck(Resident resident, String confirmPassword){
         int n, check = 0;
         //nameCheck
-        for(n=0; n <9; n++) {
+        for(n=0; n <10; n++) {
             switch(n)
             {
                 case 1: //namecheck
@@ -138,7 +133,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(RegisterActivity.this, "Your name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
+                        n = 9;
                         break;
                     }
                 case 2://profilenamecheck
@@ -146,7 +141,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(RegisterActivity.this, "Your Profile name cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
+                        n = 9;
                         break;
                     }
                 case 3: //IcNocheck
@@ -154,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(RegisterActivity.this, "Please ensure your Ic No is correct",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
+                        n = 9;
                         break;
                     }
                 case 4: //phoneNoCheck
@@ -162,7 +157,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(RegisterActivity.this, "Your phone number cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
+                        n = 9;
                         break;
                     }
                 case 5: //passwordcheck
@@ -170,40 +165,42 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                         Toast.makeText(RegisterActivity.this, "Your password cannot be empty!!",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
+                        n = 9;
                         break;
                     }
                 case 6: //compare password and current password
-                    if (resident.getPassword() != confirmPassword) {
+                    if (resident.getPassword().equals(confirmPassword)) {
                         Toast.makeText(RegisterActivity.this, "Please make sure you type in the same password",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
-                        break;
-                    }
+                        n = 9;
+
+                    }break;
                 case 7:
                     if (resident.getFrontImage() == null || resident.getBackImage() == null) {
                         Toast.makeText(RegisterActivity.this, "Please take picture for both side of IC",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;
-                        n = 7;
-                        break;
-                    }
+                        n = 9;
+
+                    }break;
                 case 8:
-                    if(n == 0){
-                        Toast.makeText(RegisterActivity.this, "Something Went Wrong, please try again",
-                                Toast.LENGTH_SHORT).show();
-                        retry();
-                    }
-                    else if(check == 1)
-                        retry();
-                    else if(check == 2)
-                        loaderManager.initLoader(1, null, this);
+                    loaderManager.initLoader(1, null, this);
+                case 9:
+
                     break;
             }
-
-
+            if(check == 1)
+                break;
+        }if(check == 0){
+            Toast.makeText(RegisterActivity.this, "Something Went Wrong, please try again",
+                    Toast.LENGTH_SHORT).show();
+            retry();
         }
+        else if(check == 1)
+            retry();
+        else
+            check = 2;
     }
 
     private void cameraResult(ActivityResult result) {
