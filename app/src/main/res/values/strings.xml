@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">E-Complaint</string>
-    <string name="api_connect">https://afae-1-32-67-197.ngrok.io/e-complain</string>
+    <string name="api_connect">https://1b63-1-32-67-197.ngrok.io/e-complain</string>
     <string name="title">Title</string>
     <string name="name">Name</string>
     <string name="password">Password</string>
