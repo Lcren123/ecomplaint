@@ -43,7 +43,6 @@ public class ForumRecyclerViewAdapter extends RecyclerView.Adapter<ForumRecycler
 
         if(complaints != null) {
             holder.setComplaint(complaints.get(position));
-            System.out.println(position);
         }
     }
 

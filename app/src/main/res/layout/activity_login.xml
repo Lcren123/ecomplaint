@@ -78,21 +78,6 @@
             android:text="@string/register" />
 
     </RelativeLayout>
-
-    <!-- Button for testing complain activity -->
-    <Button
-        android:onClick="complain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Complain" />
-
-    <Button
-        android:onClick="forum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Complain" />
 </LinearLayout>
 
 

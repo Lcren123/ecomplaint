@@ -65,17 +65,7 @@ public class ForumLoader extends AsyncTaskLoader<List<Complaint>> {
                     Complaint complaint = new Complaint();
                     complaint.setComplaintID(response.getJSONObject(i).getInt("ComplaintID"));
                     complaint.setComplaintTitle(response.getJSONObject(i).getString("ComplaintTitle"));
-                    complaint.setComplaintDescription(response.getJSONObject(i).getString("ComplaintDescription"));
-                    complaint.setComplaintLongitude(response.getJSONObject(i).getDouble("ComplaintLongitude"));
-                    complaint.setComplaintLatitude(response.getJSONObject(i).getDouble("ComplaintLatitude"));
-                    complaint.setComplaintStatus(response.getJSONObject(i).getString("ComplaintStatus"));
                     complaint.setComplaintDateTime(response.getJSONObject(i).getString("ComplaintDateTime"));
-
-                    Resident resident = new Resident();
-                    resident.setResidentID(response.getJSONObject(i).getInt("ResidentID"));
-                    resident.setUserID(response.getJSONObject(i).getInt("UserID"));
-                    resident.setUserProfileName(response.getJSONObject(i).getString("UserProfileName"));
-                    complaint.setResident(resident);
 
                     ComplaintCategory complaintCategory = new ComplaintCategory();
                     complaintCategory.setCategoryName(response.getJSONObject(i).getString("CategoryName"));
