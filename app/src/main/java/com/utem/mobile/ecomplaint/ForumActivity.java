@@ -29,6 +29,7 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
     private ForumRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private List<Complaint> complaints;
 
 
     @Override
@@ -63,6 +64,7 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
             System.out.println("success");
             System.out.println(data.size());
             recyclerView = findViewById(R.id.forum);
+            complaints = data;
             adapter = new ForumRecyclerViewAdapter(this, data,this);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -78,7 +80,8 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onItemClick(int position) {
-        Intent intent = new Intent(this,LoginActivity.class);
+        Intent intent = new Intent(this,ForumDetailActivity.class);
+        intent.putExtra("complaintID",complaints.get(position).getComplaintID());
         startActivity(intent);
     }
 }
