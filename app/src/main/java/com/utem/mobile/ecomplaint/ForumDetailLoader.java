@@ -6,36 +6,36 @@ import android.graphics.BitmapFactory;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
 
 import com.utem.mobile.ecomplaint.model.Complaint;
 import com.utem.mobile.ecomplaint.model.ComplaintCategory;
 import com.utem.mobile.ecomplaint.model.ComplaintImage;
-import com.utem.mobile.ecomplaint.model.Resident;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ForumLoader extends AsyncTaskLoader<List<Complaint>> {
 
+public class ForumDetailLoader extends AsyncTaskLoader<Complaint> {
+
+    private final int complaintID;
     private final String apiConnect;
 
-
-    public ForumLoader(@NonNull Context context) {
+    public ForumDetailLoader(@NonNull Context context, int complaintID) {
         super(context);
+        this.complaintID = complaintID;
         this.apiConnect = context.getString(R.string.api_connect);
     }
 
@@ -46,32 +46,37 @@ public class ForumLoader extends AsyncTaskLoader<List<Complaint>> {
 
     @Nullable
     @Override
-    public List<Complaint> loadInBackground() {
-        List<Complaint> complaints = null;
-
+    public Complaint loadInBackground() {
+        Complaint complaint = null;
         try {
             HttpsURLConnection connection = (HttpsURLConnection)
-                    new URL(apiConnect + "/getAllComplaint.jsp").openConnection();
+                    new URL(apiConnect + "/getSpecificComplaint.jsp").openConnection();
 
-            connection.setRequestMethod("GET");
+            JSONObject request = new JSONObject();
+            request.put("ComplaintID",complaintID);
+
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.getOutputStream().write(request.toString().getBytes());
 
             System.out.println(connection.getResponseCode());
 
             if (connection.getResponseCode() == 200) {
-                complaints = new ArrayList<>();
-
-                JSONArray response = new JSONArray(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
-                for(int i = 0; i < response.length(); i++){
-                    Complaint complaint = new Complaint();
-                    complaint.setComplaintID(response.getJSONObject(i).getInt("ComplaintID"));
-                    complaint.setComplaintTitle(response.getJSONObject(i).getString("ComplaintTitle"));
-                    complaint.setComplaintDateTime(response.getJSONObject(i).getString("ComplaintDateTime"));
+                complaint = new Complaint();
+                JSONObject response = new JSONObject(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
+                    complaint.setComplaintID(response.getInt("ComplaintID"));
+                    complaint.setComplaintTitle(response.getString("ComplaintTitle"));
+                    complaint.setComplaintDateTime(response.getString("ComplaintDateTime"));
+                    complaint.setComplaintDescription(response.getString("ComplaintDescription"));
+                    complaint.setComplaintLongitude(response.getDouble("ComplaintLongitude"));
+                    complaint.setComplaintLatitude(response.getDouble("ComplaintLatitude"));
 
                     ComplaintCategory complaintCategory = new ComplaintCategory();
-                    complaintCategory.setCategoryName(response.getJSONObject(i).getString("CategoryName"));
+                    complaintCategory.setCategoryName(response.getString("CategoryName"));
                     complaint.setCategory(complaintCategory);
 
-                    JSONArray complaintImages = response.getJSONObject(i).getJSONArray("ComplaintImages");
+                    JSONArray complaintImages = response.getJSONArray("ComplaintImages");
 
                     List<ComplaintImage> complaintImageList = new ArrayList<>();
                     for(int j = 0; j < complaintImages.length(); j++){
@@ -84,13 +89,11 @@ public class ForumLoader extends AsyncTaskLoader<List<Complaint>> {
                         complaintImageList.add(complaintImage);
                     }
                     complaint.setImageList(complaintImageList);
-                    complaints.add(complaint);
-                }
             }
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return complaints;
+        return complaint;
     }
 }

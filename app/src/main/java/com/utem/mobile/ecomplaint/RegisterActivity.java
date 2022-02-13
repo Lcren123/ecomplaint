@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -51,13 +52,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         if (data != null) {
             Intent intent;
             //System.out.println(data);
-            String token = data.getString("Token", null);
+            int result = data.getInt("result", 0);
 
-            if (token != null) {
+            if (result == 1) {
                 Toast.makeText(RegisterActivity.this, "Register Success",
                         Toast.LENGTH_SHORT).show();
                 intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                intent.putExtra("Token", token);
                 startActivity(intent);
             } else {
                 Toast.makeText(RegisterActivity.this, "Something Went Wrong, please try again",
@@ -82,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtProfileName = findViewById(R.id.editProfileName);
         IcNo = findViewById(R.id.editIC);
         phoneNo = findViewById(R.id.editPhoneNo);
-        txtPassword = findViewById(R.id.editPassword);
+        txtPassword = findViewById(R.id.editNewPassword);
         txtConfirmPassword = findViewById(R.id.editConfirmPassword);
         resident = new Resident();
         IcFrontImage = findViewById(R.id.FrontIC);
@@ -220,7 +220,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         txtPassword.setEnabled(false);
         resident.setPassword(txtPassword.getText().toString());
         txtConfirmPassword.setEnabled(false);
-
+        BitmapDrawable frontDrawable = (BitmapDrawable) IcFrontImage.getDrawable();
+        BitmapDrawable backDrawable = (BitmapDrawable) IcBackImage.getDrawable();
+        resident.setFrontImage(frontDrawable.getBitmap());
+        resident.setBackImage(backDrawable.getBitmap());
 
         registerCheck(resident, txtConfirmPassword.getText().toString());
 
@@ -284,7 +287,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
 
                     }
 
-                    else if  (resident.getPassword().equals(confirmPassword)) {
+                    else if  (!resident.getPassword().equals(confirmPassword)) {
                         Toast.makeText(RegisterActivity.this, "Please make sure you type in the same password",
                                 Toast.LENGTH_SHORT).show();
                         check = 1;

@@ -14,6 +14,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.utem.mobile.ecomplaint.model.Complaint;
 
@@ -26,12 +28,15 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
     private LoaderManager loaderManager;
     private ForumRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
+    private List<Complaint> complaints;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
+        progressBar = findViewById(R.id.spinnerLoader);
 
         loaderManager = LoaderManager.getInstance(this);
 
@@ -39,6 +44,7 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if(networkInfo != null) {
+            progressBar.setVisibility(View.VISIBLE);
             loaderManager.initLoader(1, null, this);
         }else{
 
@@ -53,15 +59,18 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Complaint>> loader, List<Complaint> data) {
+
         if(data != null){
             System.out.println("success");
             System.out.println(data.size());
             recyclerView = findViewById(R.id.forum);
+            complaints = data;
             adapter = new ForumRecyclerViewAdapter(this, data,this);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             System.out.println("finish");
         }
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -71,7 +80,8 @@ public class ForumActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onItemClick(int position) {
-        Intent intent = new Intent(this,LoginActivity.class);
+        Intent intent = new Intent(this,ForumDetailActivity.class);
+        intent.putExtra("complaintID",complaints.get(position).getComplaintID());
         startActivity(intent);
     }
 }

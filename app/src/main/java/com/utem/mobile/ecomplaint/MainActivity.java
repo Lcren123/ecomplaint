@@ -1,8 +1,11 @@
 package com.utem.mobile.ecomplaint;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -31,10 +34,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Logout(View view) {
-        Intent intent = new Intent();
+        AlertDialog builder = new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Do you sure you want to logout?")
+                .setCancelable(false)
+                .setPositiveButton("Yes",this::confirmLogout)
+                .setNegativeButton("No",this::cancelLogout)
+                .show();
 
-        intent = new Intent(MainActivity.this, LoginActivity.class);
+    }
+
+    private void cancelLogout(DialogInterface dialogInterface, int i) {
+    }
+
+    private void confirmLogout(DialogInterface dialogInterface, int i) {
+        SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
-
+        finish();
     }
 }

@@ -435,8 +435,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             complaintRoom.setComplaintLatitude(complaint.getComplaintLatitude());
             complaintRoom.setComplaintStatus(complaint.getComplaintStatus());
             complaintRoom.setUsername(username);
-           // complaintRoom.setComplaintID(complaint.getCategory().getComplaintCategoryID());
-          //  complaintRoom.setComplaintID(1);
+            complaintRoom.setCategoryName(complaint.getCategory().getCategoryName());
             complaintRoom.setConnectedToDatabase(false);
 
             List<ComplaintImageRoom> images = null;
@@ -458,9 +457,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
 
             complaintViewModel.addComplaint(complaintRoom,images);
             Toast.makeText(this, "Added into room database", Toast.LENGTH_SHORT).show();
-
         }
-
     }
 
     private void createNotificationChannel() {
@@ -503,7 +500,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
             //request.put("Username",complaint.getResident().getUserName());
             request.put("Username","resident");
 
-            request.put("CategoryID",1);
+            request.put("CategoryName",localComplaint.getCategory().getCategoryName());
             //request.put("CategoryID",complaint.getCategory().getComplaintCategoryID());
 
             HttpsURLConnection connection = (HttpsURLConnection)
@@ -519,7 +516,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 System.out.println("200");
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                         .setContentTitle("Local complaint updated")
-                        .setContentText("Your local complaint has been uploaded")
+                        .setContentText("Your local complaint " + localComplaint.getComplaintTitle() + " has been uploaded")
                         .setSmallIcon(R.drawable.ic_baseline_notifications_24)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 

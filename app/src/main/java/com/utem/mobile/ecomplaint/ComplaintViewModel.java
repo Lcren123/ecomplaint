@@ -58,7 +58,7 @@ public class ComplaintViewModel extends AndroidViewModel {
             complaint.setComplaintDateTime(complaintRoom.getComplaintDateTime());
 
             ComplaintCategory complaintCategory = new ComplaintCategory();
-            complaintCategory.setComplaintCategoryID(complaintRoom.getCategoryID());
+            complaintCategory.setCategoryName(complaintRoom.getCategoryName());
             complaint.setCategory(complaintCategory);
 
             List<ComplaintImageRoom> imageRooms = complaintManager.getComplaintImages(complaintRoom.getComplaintID());

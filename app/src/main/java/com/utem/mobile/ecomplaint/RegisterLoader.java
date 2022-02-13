@@ -1,6 +1,7 @@
 package com.utem.mobile.ecomplaint;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,8 +13,10 @@ import com.utem.mobile.ecomplaint.model.Resident;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Base64;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -26,7 +29,7 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
 
     public RegisterLoader(@NonNull Context context, Resident newResident) {
         super(context);
-      this.resident = newResident;
+        this.resident = newResident;
         this.apiConnect = context.getString(R.string.api_connect);
     }
 
@@ -42,14 +45,17 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
 
         try {
             JSONObject request = new JSONObject();
-            String token = null;
+            int token = 0;
 
             request.put("UserName", resident.getUserName());
             request.put("UserPassword", resident.getPassword());
             request.put("UserIC", resident.getUserIC());
-            request.put("UserPhone",resident.getUserPhone());
-            request.put("UserProfileName",resident.getUserProfileName());
-            request.put("Role","resident");
+            request.put("UserPhone", resident.getUserPhone());
+            request.put("UserProfileName", resident.getUserProfileName());
+            request.put("Role", "resident");
+
+            request.put("Front",encodeBitMap(resident.getFrontImage()));
+            request.put("Back",encodeBitMap(resident.getBackImage()));
 
             HttpsURLConnection connection = (HttpsURLConnection)
                     new URL(apiConnect + "/register.jsp").openConnection();
@@ -63,9 +69,9 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
                 System.out.println("200");
                 response = new Bundle();
                 JSONObject resp = new JSONObject(new BufferedReader(new InputStreamReader(connection.getInputStream())).lines().collect(Collectors.joining()));
-                token = response.getString("Token");
+                token = response.getInt("result");
 
-                response.putString("Token", resp.getString("Token"));
+                response.putInt("result", resp.getInt("result"));
             }
 
             connection.disconnect();
@@ -75,5 +81,13 @@ public class RegisterLoader extends AsyncTaskLoader<Bundle> {
         return response;
     }
 
+    private String encodeBitMap(Bitmap bitmap){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encodeImage = encoder.encodeToString(byteArray);
+        return encodeImage;
     }
+}
 

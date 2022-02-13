@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 @Entity
 public class ComplaintRoom {
 
-    private int categoryID;
+    private String categoryName;
     private String username;
 
     @PrimaryKey(autoGenerate = true)
@@ -27,12 +27,12 @@ public class ComplaintRoom {
         isConnectedToDatabase = connectedToDatabase;
     }
 
-    public int getCategoryID() {
-        return categoryID;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategoryID(int categoryID) {
-        this.categoryID = categoryID;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getUsername() {
