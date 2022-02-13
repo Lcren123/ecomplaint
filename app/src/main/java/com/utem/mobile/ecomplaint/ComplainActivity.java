@@ -497,7 +497,7 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
                 System.out.println("200");
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                         .setContentTitle("Local complaint updated")
-                        .setContentText("Your local complaint has been uploaded")
+                        .setContentText("Your local complaint " + localComplaint.getComplaintTitle() + " has been uploaded")
                         .setSmallIcon(R.drawable.ic_baseline_notifications_24)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
