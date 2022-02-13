@@ -409,8 +409,12 @@ public class ComplainActivity extends AppCompatActivity implements LoaderManager
         complaint.setImageList(complaintImageList);
         complaint.setComplaintTitle(txtTitle.getText().toString());
         complaint.setComplaintDescription(txtDescription.getText().toString());
-        Resident resident = new Resident();
 
+        ComplaintCategory complaintCategory = new ComplaintCategory();
+        complaintCategory.setCategoryName(txtCategory.getText().toString());
+        complaint.setCategory(complaintCategory);
+
+        Resident resident = new Resident();
         SharedPreferences sharedPreferences = getSharedPreferences("com.utem.mobile.ecomplaint",MODE_PRIVATE);
         String token = sharedPreferences.getString("Token",null);
         System.out.println(token);
